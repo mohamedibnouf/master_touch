@@ -1,0 +1,72 @@
+"use client";
+
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Tooltip,
+  Legend,
+  Filler,
+} from "chart.js";
+import { Line, Bar } from "react-chartjs-2";
+import { useTranslations } from "next-intl";
+import { Card } from "@/presentation/components/ui/primitives";
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Tooltip,
+  Legend,
+  Filler,
+);
+
+export default function DashboardCharts() {
+  const t = useTranslations("admin");
+
+  const traffic = {
+    labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+    datasets: [
+      {
+        label: t("visitors"),
+        data: [120, 190, 150, 220, 280, 240, 300],
+        borderColor: "#E87722",
+        backgroundColor: "rgba(232,119,34,0.15)",
+        fill: true,
+        tension: 0.35,
+      },
+    ],
+  };
+
+  const messagesChart = {
+    labels: ["New", "Read", "Replied", "Archived"],
+    datasets: [
+      {
+        label: t("messages"),
+        data: [12, 8, 5, 3],
+        backgroundColor: ["#0B1F3A", "#132F54", "#E87722", "#94a3b8"],
+      },
+    ],
+  };
+
+  return (
+    <div className="grid gap-4 lg:grid-cols-2">
+      <Card>
+        <p className="mb-4 font-semibold text-[var(--primary)]">{t("traffic")}</p>
+        <Line data={traffic} options={{ responsive: true, plugins: { legend: { display: false } } }} />
+      </Card>
+      <Card>
+        <p className="mb-4 font-semibold text-[var(--primary)]">{t("messages")}</p>
+        <Bar
+          data={messagesChart}
+          options={{ responsive: true, plugins: { legend: { display: false } } }}
+        />
+      </Card>
+    </div>
+  );
+}

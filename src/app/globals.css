@@ -2,25 +2,112 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #0f172a;
+  --primary: #0b1f3a;
+  --primary-foreground: #f8fafc;
+  --secondary: #132f54;
+  --accent: #e87722;
+  --accent-foreground: #ffffff;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --border: #e2e8f0;
+  --card: rgba(255, 255, 255, 0.72);
+  --radius: 0.75rem;
+  --ring: #e87722;
+}
+
+.dark {
+  --background: #07111f;
+  --foreground: #e2e8f0;
+  --primary: #1a3a63;
+  --primary-foreground: #f8fafc;
+  --secondary: #0b1f3a;
+  --muted: #132033;
+  --muted-foreground: #94a3b8;
+  --border: #1e293b;
+  --card: rgba(15, 23, 42, 0.72);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-card: var(--card);
+  --color-ring: var(--ring);
+  --radius-lg: var(--radius);
+  --font-sans: var(--font-manrope);
+  --font-display: var(--font-cormorant);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  border-color: var(--border);
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-manrope), system-ui, sans-serif;
+  min-height: 100vh;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.focus\:not-sr-only:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: inherit;
+  margin: inherit;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+.font-display {
+  font-family: var(--font-cormorant), Georgia, serif;
+}
+
+.glass {
+  background: var(--card);
+  backdrop-filter: blur(16px);
+  border: 1px solid color-mix(in oklab, var(--border) 80%, transparent);
+  box-shadow: 0 10px 40px rgba(11, 31, 58, 0.06);
+}
+
+.hero-gradient {
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 20%, rgba(232, 119, 34, 0.18), transparent 55%),
+    radial-gradient(ellipse 70% 50% at 80% 30%, rgba(19, 47, 84, 0.35), transparent 50%),
+    linear-gradient(135deg, #0b1f3a 0%, #132f54 45%, #0b1f3a 100%);
+}
+
+.section-pad {
+  padding-block: clamp(3.5rem, 8vw, 6.5rem);
+  padding-inline: clamp(1.25rem, 4vw, 2rem);
+}
+
+.container-mt {
+  width: min(1120px, 100%);
+  margin-inline: auto;
 }
