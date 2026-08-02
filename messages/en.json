@@ -69,7 +69,9 @@
     "newPassword": "New password",
     "confirmPassword": "Confirm password",
     "updatePassword": "Update password",
-    "resetSent": "If the email exists, a reset link has been sent."
+    "resetSent": "If the email exists, a reset link has been sent.",
+    "forbidden": "Signed in successfully, but this account has no admin access. Assign a role (e.g. super_admin) then try again.",
+    "inactive": "This account is inactive. Contact an administrator."
   },
   "admin": {
     "dashboard": "Dashboard",
@@ -83,6 +85,7 @@
     "media": "Media Library",
     "theme": "Theme Manager",
     "translations": "Translation Manager",
+    "seo": "SEO Manager",
     "settings": "Settings",
     "profile": "Profile",
     "logout": "Sign out",

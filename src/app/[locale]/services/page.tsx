@@ -1,7 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Locale } from "@/lib/i18n/config";
 import { getPageSeo, getServices } from "@/infrastructure/repositories/content.repository";
-import { SectionHeading, ServiceCard } from "@/presentation/components/marketing/sections";
+import { PageHero, ServiceCard } from "@/presentation/components/marketing/sections";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 import type { Metadata } from "next";
 
@@ -30,19 +30,37 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
   const t = await getTranslations("pages");
 
   return (
-    <div className="pt-20">
-      <section className="hero-gradient section-pad text-white">
+    <div>
+      <PageHero
+        title={t("servicesTitle")}
+        subtitle={t("servicesIntro")}
+        imageSrc="/images/placeholders/hero-2.svg"
+      />
+      <section className="services-engineering section-pad">
         <div className="container-mt">
-          <h1 className="font-display text-5xl md:text-6xl">{t("servicesTitle")}</h1>
-          <p className="mt-4 max-w-2xl text-white/80">{t("servicesIntro")}</p>
-        </div>
-      </section>
-      <section className="section-pad">
-        <div className="container-mt">
-          <SectionHeading title={t("servicesWhatWeDeliver")} subtitle={t("servicesSubtitle")} />
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {services.map((service) => (
-              <ServiceCard key={service.id} service={service} locale={locale} />
+          <div className="mb-14 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-2xl">
+              <p className="eyebrow mb-4">Systems</p>
+              <h2 className="font-display text-h2 font-semibold tracking-tight text-[var(--primary)]">
+                {t("servicesWhatWeDeliver")}
+              </h2>
+              <p className="mt-4 text-base leading-relaxed text-[var(--muted-foreground)] md:text-lg">
+                {t("servicesSubtitle")}
+              </p>
+            </div>
+            <span className="text-[0.65rem] font-semibold tracking-[0.22em] uppercase text-[var(--muted-foreground)]">
+              {String(services.length).padStart(2, "0")} disciplines
+            </span>
+          </div>
+          <div className="grid gap-5 md:grid-cols-2">
+            {services.map((service, i) => (
+              <ServiceCard
+                key={service.id}
+                service={service}
+                locale={locale}
+                featured={i === 0}
+                index={i}
+              />
             ))}
           </div>
         </div>

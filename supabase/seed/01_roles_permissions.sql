@@ -48,7 +48,8 @@ SELECT * FROM (VALUES
   ('translations.manage', 'translations', 'manage', '{"ar":"إدارة الترجمة","en":"Manage translations"}'::JSONB),
   ('settings.view', 'settings', 'view', '{"ar":"عرض الإعدادات","en":"View settings"}'::JSONB),
   ('settings.manage', 'settings', 'manage', '{"ar":"إدارة الإعدادات","en":"Manage settings"}'::JSONB),
-  ('audit_logs.view', 'audit_logs', 'view', '{"ar":"عرض السجلات","en":"View audit logs"}'::JSONB)
+  ('audit_logs.view', 'audit_logs', 'view', '{"ar":"عرض السجلات","en":"View audit logs"}'::JSONB),
+  ('audit_logs.manage', 'audit_logs', 'manage', '{"ar":"إدارة السجلات","en":"Manage audit logs"}'::JSONB)
 ) AS v(key, module, action, description_i18n)
 ON CONFLICT (key) DO NOTHING;
 

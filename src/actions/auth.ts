@@ -7,7 +7,7 @@ import { loginSchema } from "@/lib/validations";
 import { assertRateLimit } from "@/infrastructure/rate-limit/service";
 import { toActionError, ValidationError, AuthenticationError } from "@/domain/shared/errors";
 import { logger } from "@/infrastructure/logging/logger";
-import { writeAuditLog } from "@/lib/permissions";
+import { writeAuditLog, safeAdminNextPath } from "@/lib/permissions";
 import { z } from "zod";
 import { createAdminClient } from "@/infrastructure/supabase/admin";
 
@@ -47,7 +47,7 @@ export async function loginAction(input: unknown) {
       });
     }
 
-    redirect(parsed.data.next || "/admin");
+    redirect(safeAdminNextPath(parsed.data.next));
   } catch (error) {
     if (typeof error === "object" && error && "digest" in error) throw error; // next redirect
     logger.error("login failed", { error });
@@ -90,6 +90,10 @@ export async function resetPasswordAction(password: string) {
   try {
     const parsed = z.string().min(8).max(128).safeParse(password);
     if (!parsed.success) throw new ValidationError("Password too short");
+
+    const hdrs = await headers();
+    const ip = hdrs.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+    await assertRateLimit(ip, { name: "reset-password", limit: 8, window: "60 s" });
 
     const supabase = await createClient();
     const { error } = await supabase.auth.updateUser({ password: parsed.data });

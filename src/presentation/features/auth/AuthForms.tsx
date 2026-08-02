@@ -18,11 +18,21 @@ const loginSchema = z.object({
   remember: z.boolean().optional(),
 });
 
-export function LoginForm({ nextPath }: { nextPath?: string }) {
+export function LoginForm({
+  nextPath,
+  accessError,
+}: {
+  nextPath?: string;
+  accessError?: "forbidden" | "inactive" | null;
+}) {
   const t = useTranslations("auth");
   const common = useTranslations("common");
   const locale = useLocale();
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(() => {
+    if (accessError === "forbidden") return t("forbidden");
+    if (accessError === "inactive") return t("inactive");
+    return null;
+  });
   const [pending, startTransition] = useTransition();
   const { register, handleSubmit } = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -31,7 +41,7 @@ export function LoginForm({ nextPath }: { nextPath?: string }) {
 
   return (
     <form
-      className="glass mx-auto w-full max-w-md space-y-4 rounded-2xl p-8"
+      className="mt-panel mx-auto w-full max-w-md space-y-4 border border-[var(--line)] p-5 sm:p-8"
       onSubmit={handleSubmit((values) => {
         setError(null);
         startTransition(async () => {
@@ -84,7 +94,7 @@ export function ForgotPasswordForm() {
 
   return (
     <form
-      className="glass mx-auto w-full max-w-md space-y-4 rounded-2xl p-8"
+      className="mt-panel mx-auto w-full max-w-md space-y-4 border border-[var(--line)] p-5 sm:p-8"
       onSubmit={handleSubmit((values) => {
         startTransition(async () => {
           const res = await forgotPasswordAction(values.email, locale);
@@ -119,7 +129,7 @@ export function ResetPasswordForm() {
 
   return (
     <form
-      className="glass mx-auto w-full max-w-md space-y-4 rounded-2xl p-8"
+      className="mt-panel mx-auto w-full max-w-md space-y-4 border border-[var(--line)] p-5 sm:p-8"
       onSubmit={handleSubmit((values) => {
         if (values.password !== values.confirm) {
           setMessage("mismatch");

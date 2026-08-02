@@ -8,28 +8,48 @@ import type {
   SiteSettings,
   ThemeSettings,
 } from "@/types/cms";
-import { createClient } from "@/infrastructure/supabase/server";
+import { createPublicClient } from "@/infrastructure/supabase/public";
+import { isSupabaseConfigured } from "@/infrastructure/supabase/config";
 import { DatabaseError, NotFoundError } from "@/domain/shared/errors";
 import { unstable_cache } from "next/cache";
+import {
+  previewAboutContent,
+  previewContactContent,
+  previewHomepageSections,
+  previewPageSeo,
+  previewServices,
+  previewSiteSettings,
+  previewThemeSettings,
+} from "@/infrastructure/repositories/preview-content";
 
-async function sb() {
-  return createClient();
+function sb() {
+  return createPublicClient();
 }
 
 export async function getThemeSettings(): Promise<ThemeSettings> {
-  const supabase = await sb();
-  const { data, error } = await supabase.from("theme_settings").select("*").limit(1).maybeSingle();
-  if (error) throw new DatabaseError(error.message, error);
-  if (!data) throw new NotFoundError("Theme settings not found. Run database seeds.");
-  return data as ThemeSettings;
+  if (!isSupabaseConfigured()) return previewThemeSettings;
+  try {
+    const supabase = sb();
+    const { data, error } = await supabase.from("theme_settings").select("*").limit(1).maybeSingle();
+    if (error) throw new DatabaseError(error.message, error);
+    if (!data) throw new NotFoundError("Theme settings not found. Run database seeds.");
+    return data as ThemeSettings;
+  } catch {
+    return previewThemeSettings;
+  }
 }
 
 export async function getSiteSettings(): Promise<SiteSettings> {
-  const supabase = await sb();
-  const { data, error } = await supabase.from("site_settings").select("*").limit(1).maybeSingle();
-  if (error) throw new DatabaseError(error.message, error);
-  if (!data) throw new NotFoundError("Site settings not found. Run database seeds.");
-  return data as SiteSettings;
+  if (!isSupabaseConfigured()) return previewSiteSettings;
+  try {
+    const supabase = sb();
+    const { data, error } = await supabase.from("site_settings").select("*").limit(1).maybeSingle();
+    if (error) throw new DatabaseError(error.message, error);
+    if (!data) throw new NotFoundError("Site settings not found. Run database seeds.");
+    return data as SiteSettings;
+  } catch {
+    return previewSiteSettings;
+  }
 }
 
 export const getCachedThemeSettings = () =>
@@ -45,7 +65,9 @@ export const getCachedSiteSettings = () =>
   })();
 
 export async function getHomepageSections(locale: AppLocale): Promise<HomepageSection[]> {
-  const supabase = await sb();
+  if (!isSupabaseConfigured()) return previewHomepageSections(locale);
+  try {
+  const supabase = sb();
   const { data: sections, error } = await supabase
     .from("homepage_sections")
     .select("*, homepage_section_translations(*), homepage_slides(*, homepage_slide_translations(*))")
@@ -107,10 +129,15 @@ export async function getHomepageSections(locale: AppLocale): Promise<HomepageSe
       slides,
     } satisfies HomepageSection;
   });
+  } catch {
+    return previewHomepageSections(locale);
+  }
 }
 
 export async function getAboutContent(locale: AppLocale): Promise<AboutContent> {
-  const supabase = await sb();
+  if (!isSupabaseConfigured()) return previewAboutContent(locale);
+  try {
+  const supabase = sb();
   const { data, error } = await supabase
     .from("about_pages")
     .select(
@@ -217,38 +244,65 @@ export async function getAboutContent(locale: AppLocale): Promise<AboutContent> 
         },
       ),
   };
+  } catch {
+    return previewAboutContent(locale);
+  }
+}
+
+function mapServiceRow(s: Record<string, unknown>, locale: AppLocale): ServiceItem {
+  const translations = (s.service_translations as Array<Record<string, unknown>>) ?? [];
+  const tr =
+    translations.find((t) => t.locale === locale) ?? translations[0];
+  return {
+    id: String(s.id),
+    slug: String(s.slug),
+    icon: (s.icon as string | null) ?? null,
+    cover_image_url: (s.cover_image_url as string | null) ?? null,
+    is_featured: Boolean(s.is_featured),
+    is_published: Boolean(s.is_published),
+    sort_order: Number(s.sort_order ?? 0),
+    title: (tr?.title as string | undefined) ?? String(s.slug),
+    summary: (tr?.summary as string | null | undefined) ?? null,
+    description: (tr?.description as string | null | undefined) ?? null,
+    seo_title: (tr?.seo_title as string | null | undefined) ?? null,
+    seo_description: (tr?.seo_description as string | null | undefined) ?? null,
+  };
 }
 
 export async function getServices(locale: AppLocale): Promise<ServiceItem[]> {
-  const supabase = await sb();
-  const { data, error } = await supabase
-    .from("services")
-    .select("*, service_translations(*)")
-    .is("deleted_at", null)
-    .eq("is_published", true)
-    .order("sort_order", { ascending: true });
+  if (!isSupabaseConfigured()) return previewServices(locale);
+  try {
+    const supabase = sb();
+    const { data, error } = await supabase
+      .from("services")
+      .select("*, service_translations(*)")
+      .is("deleted_at", null)
+      .eq("is_published", true)
+      .order("sort_order", { ascending: true });
 
-  if (error) throw new DatabaseError(error.message, error);
+    if (error) throw new DatabaseError(error.message, error);
+    return (data ?? []).map((s) => mapServiceRow(s as Record<string, unknown>, locale));
+  } catch {
+    return previewServices(locale);
+  }
+}
 
-  return (data ?? []).map((s) => {
-    const tr =
-      s.service_translations?.find((t: { locale: string }) => t.locale === locale) ??
-      s.service_translations?.[0];
-    return {
-      id: s.id,
-      slug: s.slug,
-      icon: s.icon,
-      cover_image_url: s.cover_image_url,
-      is_featured: s.is_featured,
-      is_published: s.is_published,
-      sort_order: s.sort_order,
-      title: tr?.title ?? s.slug,
-      summary: tr?.summary ?? null,
-      description: tr?.description ?? null,
-      seo_title: tr?.seo_title ?? null,
-      seo_description: tr?.seo_description ?? null,
-    };
-  });
+/** Admin list: includes drafts/unpublished (service role). */
+export async function getAdminServices(locale: AppLocale): Promise<ServiceItem[]> {
+  if (!isSupabaseConfigured()) return previewServices(locale);
+  try {
+    const { createAdminClient } = await import("@/infrastructure/supabase/admin");
+    const admin = createAdminClient();
+    const { data, error } = await admin
+      .from("services")
+      .select("*, service_translations(*)")
+      .is("deleted_at", null)
+      .order("sort_order", { ascending: true });
+    if (error) throw new DatabaseError(error.message, error);
+    return (data ?? []).map((s) => mapServiceRow(s as Record<string, unknown>, locale));
+  } catch {
+    return previewServices(locale);
+  }
 }
 
 export async function getServiceBySlug(
@@ -260,7 +314,9 @@ export async function getServiceBySlug(
 }
 
 export async function getContactContent(locale: AppLocale): Promise<ContactContent> {
-  const supabase = await sb();
+  if (!isSupabaseConfigured()) return previewContactContent(locale);
+  try {
+  const supabase = sb();
   const { data, error } = await supabase
     .from("contact_settings")
     .select(
@@ -336,10 +392,15 @@ export async function getContactContent(locale: AppLocale): Promise<ContactConte
         }),
       ),
   };
+  } catch {
+    return previewContactContent(locale);
+  }
 }
 
 export async function getPageSeo(slug: string, locale: AppLocale): Promise<PageSeo | null> {
-  const supabase = await sb();
+  if (!isSupabaseConfigured()) return previewPageSeo(slug, locale);
+  try {
+  const supabase = sb();
   const { data: page, error } = await supabase
     .from("pages")
     .select("id, page_seo(*)")
@@ -363,4 +424,7 @@ export async function getPageSeo(slug: string, locale: AppLocale): Promise<PageS
     canonical_url: seo.canonical_url,
     robots: seo.robots,
   };
+  } catch {
+    return previewPageSeo(slug, locale);
+  }
 }

@@ -44,7 +44,7 @@ export function ContactForm({ successMessage }: { successMessage: string }) {
 
   if (done) {
     return (
-      <div className="glass rounded-2xl p-8 text-[var(--primary)]" role="status">
+      <div className="mt-panel border border-[var(--line)] bg-[var(--surface)] p-8 text-[var(--primary)]" role="status">
         <p className="font-semibold">{t("success")}</p>
         <p className="mt-2 text-sm text-[var(--muted-foreground)]">{successMessage}</p>
         <Button className="mt-4" variant="outline" onClick={() => setDone(false)}>
@@ -55,7 +55,11 @@ export function ContactForm({ successMessage }: { successMessage: string }) {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="glass space-y-4 rounded-2xl p-6" dir={locale === "ar" ? "rtl" : "ltr"}>
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="space-y-5 border border-[var(--line)] bg-[var(--surface)] p-6 md:p-8"
+      dir={locale === "ar" ? "rtl" : "ltr"}
+    >
       <div>
         <Label htmlFor="name">{t("name")}</Label>
         <Input id="name" {...register("name")} />

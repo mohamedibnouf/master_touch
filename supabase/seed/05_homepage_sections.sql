@@ -39,8 +39,8 @@ VALUES
   ('55555555-5555-5555-5555-555555555006', 'en', 'Our values', 'What we uphold in every detail of our work', NULL, NULL, NULL),
   ('55555555-5555-5555-5555-555555555007', 'ar', 'خدماتنا', 'حلول متكاملة عبر قطاعات متعددة', NULL, 'كل الخدمات', '/services'),
   ('55555555-5555-5555-5555-555555555007', 'en', 'Our services', 'Integrated solutions across multiple sectors', NULL, 'All services', '/services'),
-  ('55555555-5555-5555-5555-555555555008', 'ar', 'لنبدأ مشروعك التالي', 'حلول موثوقة تلبي تطلعات عملائنا وتواكب متطلبات السوق ورؤية المملكة 2030.', 'تواصل معنا', '/contact'),
-  ('55555555-5555-5555-5555-555555555008', 'en', 'Let us start your next project', 'Trusted solutions that meet client ambitions and keep pace with the market and Vision 2030.', 'Contact us', '/contact'),
+  ('55555555-5555-5555-5555-555555555008', 'ar', 'لنبدأ مشروعك التالي', 'حلول موثوقة تلبي تطلعات عملائنا وتواكب متطلبات السوق ورؤية المملكة 2030.', NULL, 'تواصل معنا', '/contact'),
+  ('55555555-5555-5555-5555-555555555008', 'en', 'Let us start your next project', 'Trusted solutions that meet client ambitions and keep pace with the market and Vision 2030.', NULL, 'Contact us', '/contact'),
   ('55555555-5555-5555-5555-555555555009', 'ar', 'موقعنا', 'الرياض، المملكة العربية السعودية', NULL, NULL, NULL),
   ('55555555-5555-5555-5555-555555555009', 'en', 'Our location', 'Riyadh, Kingdom of Saudi Arabia', NULL, NULL, NULL)
 ON CONFLICT (section_id, locale) DO NOTHING;

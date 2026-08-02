@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect } from "react";
 import { isAppError } from "@/domain/shared/errors";
 import { logger } from "@/infrastructure/logging/logger";
 
@@ -8,7 +11,9 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  logger.error("global.error", { error, digest: error.digest });
+  useEffect(() => {
+    logger.error("global.error", { error, digest: error.digest });
+  }, [error]);
 
   const message = isAppError(error) ? error.message : "A critical error occurred.";
 

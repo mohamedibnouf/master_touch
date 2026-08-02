@@ -58,14 +58,29 @@ export default function DashboardCharts() {
     <div className="grid gap-4 lg:grid-cols-2">
       <Card>
         <p className="mb-4 font-semibold text-[var(--primary)]">{t("traffic")}</p>
-        <Line data={traffic} options={{ responsive: true, plugins: { legend: { display: false } } }} />
+        <div className="relative min-h-[12rem] w-full overflow-x-auto sm:min-h-[14rem]">
+          <Line
+            data={traffic}
+            options={{
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { display: false } },
+            }}
+          />
+        </div>
       </Card>
       <Card>
         <p className="mb-4 font-semibold text-[var(--primary)]">{t("messages")}</p>
-        <Bar
-          data={messagesChart}
-          options={{ responsive: true, plugins: { legend: { display: false } } }}
-        />
+        <div className="relative min-h-[12rem] w-full overflow-x-auto sm:min-h-[14rem]">
+          <Bar
+            data={messagesChart}
+            options={{
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { display: false } },
+            }}
+          />
+        </div>
       </Card>
     </div>
   );

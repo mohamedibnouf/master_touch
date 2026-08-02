@@ -3,11 +3,12 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Locale } from "@/lib/i18n/config";
 import { getServiceBySlug, getServices } from "@/infrastructure/repositories/content.repository";
 import { Button } from "@/presentation/components/ui/button";
-import { ServiceCard } from "@/presentation/components/marketing/sections";
+import { PageHero, ServiceCard } from "@/presentation/components/marketing/sections";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ArrowUpRight } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -54,7 +55,7 @@ export default async function ServiceDetailPage({
   const related = (await getServices(locale)).filter((s) => s.id !== service.id).slice(0, 3);
 
   return (
-    <div className="pt-20">
+    <div>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -83,27 +84,33 @@ export default async function ServiceDetailPage({
           ),
         }}
       />
-      <section className="hero-gradient section-pad text-white">
-        <div className="container-mt max-w-3xl">
-          <h1 className="font-display text-5xl">{service.title}</h1>
-          <p className="mt-4 text-lg text-white/80">{service.summary}</p>
-        </div>
-      </section>
+      <PageHero
+        title={service.title}
+        subtitle={service.summary}
+        imageSrc={service.cover_image_url || "/images/placeholders/hero-1.svg"}
+      />
       <section className="section-pad">
         <div className="container-mt max-w-3xl">
-          <p className="text-lg leading-relaxed text-[var(--muted-foreground)]">{service.description}</p>
-          <Link href={`/${locale}/contact`} className="mt-8 inline-block">
-            <Button variant="accent">{t("requestQuote")}</Button>
+          <p className="text-lg leading-relaxed text-[var(--muted-foreground)] md:text-xl">
+            {service.description}
+          </p>
+          <Link href={`/${locale}/contact`} className="mt-10 inline-block">
+            <Button variant="accent" size="lg">
+              {t("requestQuote")}
+              <ArrowUpRight className="h-4 w-4" aria-hidden />
+            </Button>
           </Link>
         </div>
       </section>
       {related.length ? (
         <section className="section-pad bg-[var(--muted)]">
           <div className="container-mt">
-            <h2 className="mb-8 font-display text-3xl text-[var(--primary)]">{t("relatedServices")}</h2>
-            <div className="grid gap-5 sm:grid-cols-3">
-              {related.map((s) => (
-                <ServiceCard key={s.id} service={s} locale={locale} />
+            <h2 className="mb-8 font-display text-h2 font-semibold tracking-tight text-[var(--primary)] md:mb-10">
+              {t("relatedServices")}
+            </h2>
+            <div className="grid gap-5 md:grid-cols-3">
+              {related.map((s, i) => (
+                <ServiceCard key={s.id} service={s} locale={locale} index={i} />
               ))}
             </div>
           </div>

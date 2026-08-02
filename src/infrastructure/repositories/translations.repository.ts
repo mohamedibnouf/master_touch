@@ -1,6 +1,8 @@
 import { unstable_cache } from "next/cache";
 import { createClient } from "@/infrastructure/supabase/server";
 import { createAdminClient } from "@/infrastructure/supabase/admin";
+import { createPublicClient } from "@/infrastructure/supabase/public";
+import { isSupabaseConfigured } from "@/infrastructure/supabase/config";
 import type { AppLocale } from "@/types/cms";
 import { DatabaseError } from "@/domain/shared/errors";
 import { logger } from "@/infrastructure/logging/logger";
@@ -20,14 +22,25 @@ function setNested(target: MessageTree, key: string, value: string) {
   cursor[parts[parts.length - 1]!] = value;
 }
 
+async function loadBootstrapMessages(locale: AppLocale): Promise<MessageTree> {
+  return (await import(`../../../messages/${locale}.json`)).default as MessageTree;
+}
+
 async function fetchTranslationsFromDb(locale: AppLocale): Promise<MessageTree> {
-  const supabase = await createClient();
+  if (!isSupabaseConfigured()) {
+    return loadBootstrapMessages(locale);
+  }
+
+  const supabase = createPublicClient();
   const { data, error } = await supabase
     .from("translations")
     .select("key, value, translation_namespaces(slug)")
     .eq("locale", locale);
 
-  if (error) throw new DatabaseError(error.message, error);
+  if (error) {
+    logger.warn("translations.db.fallback", { locale, error: error.message });
+    return loadBootstrapMessages(locale);
+  }
 
   const tree: MessageTree = {};
   for (const row of data ?? []) {
@@ -38,7 +51,7 @@ async function fetchTranslationsFromDb(locale: AppLocale): Promise<MessageTree> 
 
   // Merge bootstrap file as deep fallback for missing keys
   try {
-    const bootstrap = (await import(`../../../messages/${locale}.json`)).default as MessageTree;
+    const bootstrap = await loadBootstrapMessages(locale);
     return deepMerge(bootstrap, tree);
   } catch {
     return tree;
@@ -76,8 +89,8 @@ export async function getCachedMessages(locale: AppLocale): Promise<MessageTree>
 }
 
 export async function listTranslationRows() {
-  const supabase = await createClient();
-  const { data, error } = await supabase
+  const admin = createAdminClient();
+  const { data, error } = await admin
     .from("translations")
     .select("id, key, locale, value, namespace_id, translation_namespaces(slug)")
     .order("key");

@@ -194,8 +194,12 @@ export interface PageSeo {
   og_title: string | null;
   og_description: string | null;
   og_image_url: string | null;
+  twitter_title?: string | null;
+  twitter_description?: string | null;
+  twitter_image_url?: string | null;
   canonical_url: string | null;
   robots: string | null;
+  schema_json?: unknown;
 }
 
 export interface MediaAsset {

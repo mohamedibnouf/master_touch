@@ -25,8 +25,8 @@ export function HomepageCmsClient({
 
   const persist = (payload: Parameters<typeof updateHomepageSectionAction>[0]) => {
     startTransition(async () => {
-      await updateHomepageSectionAction(payload);
-      setSaved(true);
+      const res = await updateHomepageSectionAction(payload);
+      if (res.ok) setSaved(true);
     });
   };
 

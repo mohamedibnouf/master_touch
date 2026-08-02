@@ -1,25 +1,27 @@
-import Link from "next/link";
 import { setRequestLocale } from "next-intl/server";
 import {
+  getAboutContent,
   getContactContent,
   getHomepageSections,
   getPageSeo,
   getServices,
 } from "@/infrastructure/repositories/content.repository";
 import {
-  CtaBanner,
+  AboutIntro,
   ContactMap,
+  CtaBanner,
   HeroSlider,
   SectionHeading,
-  ServiceCard,
+  ServicesShowcase,
   StatsCounter,
   TextBlock,
   ValuesGrid,
+  VisionMissionPair,
 } from "@/presentation/components/marketing/sections";
-import { Button } from "@/presentation/components/ui/button";
 import type { Locale } from "@/lib/i18n/config";
 import type { Metadata } from "next";
 import { buildPageMetadata } from "@/lib/seo/metadata";
+import type { HomepageSection } from "@/types/cms";
 
 export async function generateMetadata({
   params,
@@ -43,79 +45,78 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const locale = raw as Locale;
   setRequestLocale(locale);
 
-  const [sections, services, contact] = await Promise.all([
+  const [sections, services, contact, about] = await Promise.all([
     getHomepageSections(locale),
     getServices(locale),
     getContactContent(locale),
+    getAboutContent(locale),
   ]);
 
   const enabled = sections.filter((s) => s.is_enabled).sort((a, b) => a.sort_order - b.sort_order);
+  const vision = enabled.find((s) => s.key === "vision");
+  const mission = enabled.find((s) => s.key === "mission");
+  const pairedIds = new Set([vision?.id, mission?.id].filter(Boolean));
 
-  return (
-    <>
-      {enabled.map((section) => {
-        switch (section.key) {
-          case "hero":
-            return <HeroSlider key={section.id} section={section} locale={locale} />;
-          case "about":
-            return (
-              <section key={section.id} className="section-pad">
-                <div className="container-mt grid items-center gap-10 md:grid-cols-2">
-                  <div>
-                    <SectionHeading title={section.title} subtitle={section.subtitle} />
-                    <p className="text-lg leading-relaxed text-[var(--muted-foreground)]">{section.body}</p>
-                    {section.cta_href ? (
-                      <Link href={`/${locale}${section.cta_href}`} className="mt-6 inline-block">
-                        <Button variant="outline">{section.cta_label}</Button>
-                      </Link>
-                    ) : null}
-                  </div>
-                  <div className="glass min-h-72 rounded-3xl bg-[url('/images/placeholders/about-cover.svg')] bg-cover bg-center" />
-                </div>
-              </section>
-            );
-          case "stats":
-            return <StatsCounter key={section.id} section={section} />;
-          case "vision":
-          case "mission":
-            return <TextBlock key={section.id} section={section} />;
-          case "values":
-            return <ValuesGrid key={section.id} section={section} />;
-          case "services":
-            return (
-              <section key={section.id} className="section-pad bg-[var(--muted)]">
-                <div className="container-mt">
-                  <div className="mb-10 flex flex-wrap items-end justify-between gap-4">
-                    <SectionHeading title={section.title} subtitle={section.subtitle} />
-                    {section.cta_href ? (
-                      <Link href={`/${locale}${section.cta_href}`}>
-                        <Button variant="accent">{section.cta_label}</Button>
-                      </Link>
-                    ) : null}
-                  </div>
-                  <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-                    {services.map((service) => (
-                      <ServiceCard key={service.id} service={service} locale={locale} />
-                    ))}
-                  </div>
-                </div>
-              </section>
-            );
-          case "cta":
-            return <CtaBanner key={section.id} section={section} locale={locale} />;
-          case "contact_map":
-            return (
-              <section key={section.id} className="section-pad">
-                <div className="container-mt">
-                  <SectionHeading title={section.title} subtitle={section.subtitle} />
-                  <ContactMap embedUrl={contact.map_embed_url} />
-                </div>
-              </section>
-            );
-          default:
-            return <TextBlock key={section.id} section={section} />;
+  const renderSection = (section: HomepageSection) => {
+    switch (section.key) {
+      case "hero":
+        return <HeroSlider key={section.id} section={section} locale={locale} />;
+      case "about":
+        return (
+          <AboutIntro
+            key={section.id}
+            section={section}
+            locale={locale}
+            coverUrl={about.cover_image_url}
+          />
+        );
+      case "stats":
+        return (
+          <StatsCounter
+            key={section.id}
+            section={section}
+            items={about.stats.map((s) => ({
+              id: s.id,
+              value: s.value,
+              label: s.label,
+            }))}
+          />
+        );
+      case "vision":
+      case "mission":
+        if (vision && mission && pairedIds.has(section.id)) {
+          if (section.id === vision.id) {
+            return <VisionMissionPair key="vision-mission" vision={vision} mission={mission} />;
+          }
+          return null;
         }
-      })}
-    </>
-  );
+        return <TextBlock key={section.id} section={section} />;
+      case "values":
+        return <ValuesGrid key={section.id} section={section} items={about.values} />;
+      case "services":
+        return (
+          <ServicesShowcase
+            key={section.id}
+            section={section}
+            services={services}
+            locale={locale}
+          />
+        );
+      case "cta":
+        return <CtaBanner key={section.id} section={section} locale={locale} />;
+      case "contact_map":
+        return (
+          <section key={section.id} className="section-pad">
+            <div className="container-mt">
+              <SectionHeading title={section.title} subtitle={section.subtitle} />
+              <ContactMap embedUrl={contact.map_embed_url} />
+            </div>
+          </section>
+        );
+      default:
+        return <TextBlock key={section.id} section={section} />;
+    }
+  };
+
+  return <>{enabled.map((section) => renderSection(section))}</>;
 }

@@ -3,22 +3,25 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[var(--radius)] text-sm font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-semibold tracking-wide transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)] disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
-        default: "bg-[var(--primary)] text-[var(--primary-foreground)] hover:opacity-90",
+        default:
+          "bg-[var(--primary)] text-[var(--primary-foreground)] hover:bg-[color-mix(in_oklab,var(--primary)_88%,white)]",
         accent: "bg-[var(--accent)] text-white hover:brightness-110",
         outline:
-          "border border-[var(--border)] bg-transparent hover:bg-[var(--muted)] text-[var(--foreground)]",
-        ghost: "hover:bg-[var(--muted)] text-[var(--foreground)]",
+          "border border-[var(--line)] bg-transparent text-[var(--foreground)] hover:border-[var(--primary)] hover:text-[var(--primary)]",
+        ghost: "text-[var(--foreground)] hover:bg-[var(--muted)]",
         secondary: "bg-[var(--secondary)] text-white hover:opacity-90",
+        light:
+          "border border-white/30 bg-white/10 text-white backdrop-blur-sm hover:bg-white hover:text-[var(--primary)]",
       },
       size: {
-        default: "h-11 px-5 py-2",
-        sm: "h-9 rounded-md px-3 text-xs",
-        lg: "h-12 rounded-xl px-8 text-base",
-        icon: "h-10 w-10",
+        default: "min-h-11 h-11 px-5 sm:px-6",
+        sm: "min-h-10 h-10 px-3.5 text-xs",
+        lg: "min-h-12 h-12 px-6 text-base sm:px-8",
+        icon: "h-11 w-11",
       },
     },
     defaultVariants: {

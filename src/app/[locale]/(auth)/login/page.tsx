@@ -7,15 +7,18 @@ export default async function LoginPage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ next?: string }>;
+  searchParams: Promise<{ next?: string; error?: string }>;
 }) {
   const { locale } = await params;
-  const { next } = await searchParams;
+  const { next, error } = await searchParams;
   setRequestLocale(locale as Locale);
+
+  const accessError =
+    error === "forbidden" || error === "inactive" ? error : null;
 
   return (
     <div className="flex min-h-screen items-center px-4 pt-24 pb-16">
-      <LoginForm nextPath={next} />
+      <LoginForm nextPath={next} accessError={accessError} />
     </div>
   );
 }

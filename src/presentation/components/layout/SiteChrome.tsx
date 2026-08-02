@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
-import { Menu, X } from "lucide-react";
+import { Menu, Moon, Sun, X, Mail, Phone, Globe, MapPin, ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTheme } from "@/presentation/components/shared/ThemeProvider";
 
 export function LocaleSwitcher({ compact }: { compact?: boolean }) {
   const locale = useLocale();
@@ -21,8 +22,8 @@ export function LocaleSwitcher({ compact }: { compact?: boolean }) {
   return (
     <div
       className={cn(
-        "inline-flex overflow-hidden rounded-full border text-xs font-semibold",
-        compact ? "border-[var(--border)] bg-white" : "border-white/20 bg-white/10 backdrop-blur",
+        "inline-flex items-center gap-1 text-xs font-semibold tracking-[0.14em]",
+        compact ? "text-[var(--foreground)]" : "text-white/70",
       )}
       role="group"
       aria-label="Language"
@@ -30,34 +31,70 @@ export function LocaleSwitcher({ compact }: { compact?: boolean }) {
       <Link
         href={switchLocale("ar")}
         className={cn(
-          "px-3 py-1.5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]",
+          "inline-flex min-h-11 min-w-9 items-center justify-center px-1.5 py-1 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]",
           locale === "ar"
-            ? "bg-[var(--accent)] text-white"
-            : compact
-              ? "text-[var(--foreground)]"
-              : "text-white/80",
+            ? compact
+              ? "text-[var(--accent)]"
+              : "text-white"
+            : "opacity-70 hover:opacity-100",
         )}
         hrefLang="ar"
         lang="ar"
+        aria-current={locale === "ar" ? "true" : undefined}
       >
         ع
       </Link>
+      <span aria-hidden className="opacity-40">
+        /
+      </span>
       <Link
         href={switchLocale("en")}
         className={cn(
-          "px-3 py-1.5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]",
+          "inline-flex min-h-11 min-w-9 items-center justify-center px-1.5 py-1 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]",
           locale === "en"
-            ? "bg-[var(--accent)] text-white"
-            : compact
-              ? "text-[var(--foreground)]"
-              : "text-white/80",
+            ? compact
+              ? "text-[var(--accent)]"
+              : "text-white"
+            : "opacity-70 hover:opacity-100",
         )}
         hrefLang="en"
         lang="en"
+        aria-current={locale === "en" ? "true" : undefined}
       >
         EN
       </Link>
     </div>
+  );
+}
+
+function ThemeQuickToggle({ light }: { light?: boolean }) {
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
+
+  if (!mounted) {
+    return <span className="inline-block h-11 w-11" aria-hidden />;
+  }
+
+  const isDark =
+    theme === "dark" ||
+    (theme === "system" &&
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches);
+
+  return (
+    <button
+      type="button"
+      className={cn(
+        "inline-flex h-11 w-11 items-center justify-center transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]",
+        light ? "text-white/80 hover:text-white" : "text-[var(--foreground)]",
+      )}
+      aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+      onClick={() => setTheme(isDark ? "light" : "dark")}
+    >
+      {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+    </button>
   );
 }
 
@@ -79,24 +116,57 @@ export function SiteHeader({ brand }: { brand: string }) {
   const pathname = usePathname();
   const links = useNavLinks();
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
 
   return (
     <>
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:start-4 focus:top-4 focus:z-[60] focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-[var(--primary)] focus:shadow"
+        className="sr-only focus:not-sr-only focus:absolute focus:start-4 focus:top-4 focus:z-[60] focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-[var(--primary)] focus:shadow"
       >
         {common("skipToContent")}
       </a>
-      <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[color-mix(in_oklab,var(--primary)_78%,transparent)] backdrop-blur-xl">
-        <div className="container-mt flex h-16 items-center justify-between gap-4 px-4 sm:h-[4.5rem]">
+      <header
+        className={cn(
+          "fixed inset-x-0 top-0 z-50 transition-all duration-500",
+          scrolled || open
+            ? "border-b border-white/10 bg-[color-mix(in_oklab,#06101c_94%,transparent)] backdrop-blur-md"
+            : "border-b border-transparent bg-gradient-to-b from-[rgba(6,16,28,0.72)] to-transparent",
+        )}
+      >
+        <div className="container-mt flex h-[var(--header-height)] items-center justify-between gap-3 px-[var(--page-gutter)]">
           <Link
             href={`/${locale}`}
-            className="font-display text-2xl font-semibold tracking-wide text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+            className="min-w-0 truncate font-display text-[clamp(1.15rem,3.5vw,1.65rem)] font-semibold tracking-[0.04em] text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
           >
             {brand}
           </Link>
-          <nav className="hidden items-center gap-6 md:flex" aria-label="Primary">
+          <nav className="hidden items-center gap-5 lg:gap-8 md:flex" aria-label="Primary">
             {links.map((link) => {
               const active =
                 pathname === link.href ||
@@ -106,27 +176,31 @@ export function SiteHeader({ brand }: { brand: string }) {
                   key={link.href}
                   href={link.href}
                   className={cn(
-                    "text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]",
-                    active ? "text-[var(--accent)]" : "text-white/85 hover:text-white",
+                    "relative whitespace-nowrap text-[0.72rem] font-medium tracking-[0.12em] uppercase transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] lg:text-[0.8rem]",
+                    active ? "text-white" : "text-white/65 hover:text-white",
                   )}
                   aria-current={active ? "page" : undefined}
                 >
                   {link.label}
+                  {active ? (
+                    <span className="absolute -bottom-2 inset-x-0 mx-auto h-px w-full bg-[var(--accent)]" />
+                  ) : null}
                 </Link>
               );
             })}
           </nav>
-          <div className="flex items-center gap-3">
+          <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+            <ThemeQuickToggle light />
             <LocaleSwitcher />
             <Link
               href={`/${locale}/contact`}
-              className="hidden rounded-full bg-[var(--accent)] px-4 py-2 text-xs font-semibold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] sm:inline-flex"
+              className="hidden min-h-11 items-center border border-white/25 px-4 text-[0.7rem] font-semibold tracking-[0.16em] uppercase text-white transition hover:border-white hover:bg-white hover:text-[var(--primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] lg:inline-flex"
             >
               {t("contact")}
             </Link>
             <button
               type="button"
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/20 text-white md:hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+              className="inline-flex h-11 w-11 items-center justify-center border border-white/20 text-white md:hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
               aria-expanded={open}
               aria-controls="mobile-nav"
               aria-label={open ? common("closeMenu") : common("openMenu")}
@@ -136,28 +210,46 @@ export function SiteHeader({ brand }: { brand: string }) {
             </button>
           </div>
         </div>
-        {open ? (
+      </header>
+
+      {open ? (
+        <div className="fixed inset-0 z-40 md:hidden" role="dialog" aria-modal="true">
+          <button
+            type="button"
+            className="absolute inset-0 bg-black/55"
+            aria-label={common("closeMenu")}
+            onClick={() => setOpen(false)}
+          />
           <nav
             id="mobile-nav"
-            className="border-t border-white/10 bg-[var(--primary)] px-4 py-4 md:hidden"
+            className="absolute inset-x-0 top-[var(--header-height)] max-h-[calc(100svh-var(--header-height))] overflow-y-auto border-t border-white/10 bg-[#06101c] px-[var(--page-gutter)] py-6"
             aria-label="Mobile"
           >
-            <ul className="space-y-2">
+            <ul className="space-y-1">
               {links.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="block rounded-xl px-3 py-3 text-sm font-medium text-white hover:bg-white/10"
+                    className="flex min-h-12 items-center px-2 py-3 text-base font-medium tracking-wide text-white/90"
                     onClick={() => setOpen(false)}
                   >
                     {link.label}
                   </Link>
                 </li>
               ))}
+              <li className="pt-3">
+                <Link
+                  href={`/${locale}/contact`}
+                  className="flex min-h-12 items-center justify-center border border-white/25 px-4 text-sm font-semibold tracking-[0.14em] uppercase text-white"
+                  onClick={() => setOpen(false)}
+                >
+                  {t("contact")}
+                </Link>
+              </li>
             </ul>
           </nav>
-        ) : null}
-      </header>
+        </div>
+      ) : null}
     </>
   );
 }
@@ -175,54 +267,124 @@ export function SiteFooter({
   const nav = useTranslations("nav");
   const locale = useLocale();
 
+  const links = [
+    { href: `/${locale}`, label: nav("home") },
+    { href: `/${locale}/about`, label: nav("about") },
+    { href: `/${locale}/services`, label: nav("services") },
+    { href: `/${locale}/contact`, label: nav("contact") },
+  ];
+
   return (
-    <footer className="border-t border-[var(--border)] bg-[var(--primary)] text-white">
-      <div className="container-mt grid gap-10 px-4 py-14 md:grid-cols-3">
-        <div>
-          <p className="font-display text-3xl">{brand}</p>
-          <p className="mt-3 max-w-sm text-sm text-white/70">{tagline || t("tagline")}</p>
-        </div>
-        <div>
-          <p className="mb-3 text-sm font-semibold uppercase tracking-wider text-[var(--accent)]">
-            {t("quickLinks")}
-          </p>
-          <ul className="space-y-2 text-sm text-white/80">
-            <li>
-              <Link href={`/${locale}`}>{nav("home")}</Link>
-            </li>
-            <li>
-              <Link href={`/${locale}/about`}>{nav("about")}</Link>
-            </li>
-            <li>
-              <Link href={`/${locale}/services`}>{nav("services")}</Link>
-            </li>
-            <li>
-              <Link href={`/${locale}/contact`}>{nav("contact")}</Link>
-            </li>
-          </ul>
-        </div>
-        <div>
-          <p className="mb-3 text-sm font-semibold uppercase tracking-wider text-[var(--accent)]">
-            {t("contact")}
-          </p>
-          <ul className="space-y-2 text-sm text-white/80">
-            <li>
-              <a href="mailto:info@mastertouchksa.com">info@mastertouchksa.com</a>
-            </li>
-            <li dir="ltr">
-              <a href="tel:+966506834610">+966-50-683-4610</a>
-            </li>
-            <li>
-              <a href="https://www.mastertouchksa.com" rel="noopener noreferrer" target="_blank">
-                www.mastertouchksa.com
-              </a>
-            </li>
-          </ul>
+    <footer className="site-footer relative isolate overflow-hidden text-[#e8e4de]">
+      <div className="site-footer__grid" aria-hidden />
+      <div className="site-footer__glow" aria-hidden />
+
+      <div className="container-mt relative z-[1] px-[var(--page-gutter)] pt-[clamp(3.25rem,8vw,5rem)] pb-12">
+        <div className="grid gap-12 lg:grid-cols-12 lg:gap-10">
+          <div className="min-w-0 lg:col-span-5">
+            <p className="font-display text-[0.65rem] tracking-[0.22em] text-[var(--accent)]">MT / FOOTER</p>
+            <p className="mt-4 font-display text-[clamp(2rem,5vw,3.35rem)] font-semibold tracking-tight text-white">
+              {brand}
+            </p>
+            <p className="mt-5 max-w-md text-sm leading-relaxed text-white/60">
+              {tagline || t("tagline")}
+            </p>
+            <div className="mt-8 flex items-center gap-3">
+              <span className="h-px w-12 bg-[var(--accent)]" aria-hidden />
+              <span className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-white/40">
+                {locale === "ar" ? "هندسة · تقنية · تنفيذ" : "Engineer · Build · Operate"}
+              </span>
+            </div>
+            <Link
+              href={`/${locale}/contact`}
+              className="mt-8 inline-flex min-h-11 items-center gap-2 border border-white/20 px-4 text-[0.7rem] font-semibold tracking-[0.16em] uppercase text-white transition hover:border-[var(--accent)] hover:bg-[var(--accent)]"
+            >
+              {nav("contact")}
+              <ArrowUpRight className="h-3.5 w-3.5" aria-hidden />
+            </Link>
+          </div>
+
+          <div className="grid gap-10 sm:grid-cols-2 lg:col-span-7 lg:grid-cols-3 lg:gap-8">
+            <div className="site-footer__col">
+              <p className="site-footer__heading">{t("quickLinks")}</p>
+              <ul className="mt-5 space-y-1">
+                {links.map((link) => (
+                  <li key={link.href}>
+                    <Link className="site-footer__link group" href={link.href}>
+                      <span className="site-footer__link-mark" aria-hidden />
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="site-footer__col">
+              <p className="site-footer__heading">{t("contact")}</p>
+              <ul className="mt-5 space-y-1">
+                <li>
+                  <a className="site-footer__link" href="mailto:info@mastertouchksa.com">
+                    <Mail className="h-3.5 w-3.5 shrink-0 text-[var(--accent)]" aria-hidden />
+                    <span className="break-all">info@mastertouchksa.com</span>
+                  </a>
+                </li>
+                <li>
+                  <a className="site-footer__link" href="tel:+966506834610" dir="ltr">
+                    <Phone className="h-3.5 w-3.5 shrink-0 text-[var(--accent)]" aria-hidden />
+                    +966-50-683-4610
+                  </a>
+                </li>
+                <li>
+                  <a
+                    className="site-footer__link"
+                    href="https://www.mastertouchksa.com"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    <Globe className="h-3.5 w-3.5 shrink-0 text-[var(--accent)]" aria-hidden />
+                    www.mastertouchksa.com
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            <div className="site-footer__col sm:col-span-2 lg:col-span-1">
+              <p className="site-footer__heading">{locale === "ar" ? "المقر" : "Studio"}</p>
+              <div className="mt-5 flex gap-3 text-sm leading-relaxed text-white/70">
+                <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[var(--accent)]" aria-hidden />
+                <p>
+                  {locale === "ar"
+                    ? "الرياض، المملكة العربية السعودية"
+                    : "Riyadh, Kingdom of Saudi Arabia"}
+                </p>
+              </div>
+              <div className="mt-6 flex flex-wrap gap-2">
+                {["MEP", "Finishing", "Smart", "O&M"].map((tag) => (
+                  <span
+                    key={tag}
+                    className="border border-white/15 px-2.5 py-1 text-[0.65rem] font-semibold tracking-[0.12em] uppercase text-white/55"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-      <div className="border-t border-white/10 py-4 text-center text-xs text-white/60">
-        © {year} {brand}. {t("rights")}
+
+      <div className="relative z-[1] border-t border-white/10">
+        <div className="container-mt flex flex-col gap-4 px-[var(--page-gutter)] py-5 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-center text-xs text-white/45 sm:text-start">
+            © {year} {brand}. {t("rights")}
+          </p>
+          <p className="inline-flex items-center justify-center gap-2 text-[0.65rem] font-semibold tracking-[0.2em] uppercase text-white/50 sm:justify-end">
+            <span className="inline-block h-1.5 w-1.5 bg-[var(--accent)]" aria-hidden />
+            Engineering Precision
+          </p>
+        </div>
       </div>
     </footer>
   );
 }
+

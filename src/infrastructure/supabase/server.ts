@@ -1,6 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
-import { assertSupabaseConfigured } from "./config";
+import { assertSupabaseConfigured, getSupabaseAnonKey, getSupabaseUrl } from "./config";
 import { AuthenticationError, DatabaseError } from "@/domain/shared/errors";
 import type { User, SupabaseClient } from "@supabase/supabase-js";
 
@@ -9,8 +9,8 @@ export async function createClient() {
   const cookieStore = await cookies();
 
   return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    getSupabaseUrl(),
+    getSupabaseAnonKey(),
     {
       cookies: {
         getAll() {

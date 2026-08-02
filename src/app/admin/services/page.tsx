@@ -1,40 +1,163 @@
-import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { getServices } from "@/infrastructure/repositories/content.repository";
-import { Card, Badge } from "@/presentation/components/ui/primitives";
+import { getAdminServices } from "@/infrastructure/repositories/content.repository";
+import { createAdminClient } from "@/infrastructure/supabase/admin";
+import { Card, Label, Textarea } from "@/presentation/components/ui/primitives";
+import { Input } from "@/presentation/components/ui/input";
 import { Button } from "@/presentation/components/ui/button";
-import { EmptyState } from "@/presentation/components/admin/AsyncStates";
+import { ImageUploadField } from "@/presentation/components/admin/ImageUploadField";
+import { IconSelect } from "@/presentation/components/admin/IconSelect";
+import { createServiceAction, deleteServiceAction, updateServiceAction } from "@/actions/cms";
+import { isSupabaseConfigured } from "@/infrastructure/supabase/config";
+
+async function loadTranslations(serviceId: string) {
+  if (!isSupabaseConfigured()) return { ar: null, en: null };
+  const admin = createAdminClient();
+  const { data } = await admin.from("service_translations").select("*").eq("service_id", serviceId);
+  const ar = data?.find((r) => r.locale === "ar") ?? null;
+  const en = data?.find((r) => r.locale === "en") ?? null;
+  return { ar, en };
+}
 
 export default async function AdminServicesPage() {
-  const services = await getServices("en");
   const t = await getTranslations("admin");
+  const services = await getAdminServices("en");
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="font-display text-3xl text-[var(--primary)]">{t("services")}</h1>
-        <Button variant="accent">{t("createService")}</Button>
-      </div>
-      {!services.length ? <EmptyState title={t("noServices")} /> : null}
-      <div className="grid gap-4">
-        {services.map((s) => (
-          <Card key={s.id} className="flex flex-wrap items-start justify-between gap-4">
-            <div>
-              <div className="mb-2 flex flex-wrap items-center gap-2">
-                <h2 className="text-lg font-semibold text-[var(--primary)]">{s.title}</h2>
-                {s.is_featured ? <Badge>{t("featured")}</Badge> : null}
-                {s.is_published ? (
-                  <Badge className="bg-emerald-50 text-emerald-700">{t("published")}</Badge>
-                ) : null}
-              </div>
-              <p className="text-sm text-[var(--muted-foreground)]">{s.summary}</p>
-              <p className="mt-2 text-xs text-[var(--muted-foreground)]">/{s.slug}</p>
-            </div>
-            <Link href={`/ar/services/${s.slug}`}>
-              <Button variant="outline">{t("edit")}</Button>
-            </Link>
-          </Card>
-        ))}
+    <div className="space-y-8">
+      <h1 className="font-display text-3xl text-[var(--primary)]">{t("services")}</h1>
+
+      <Card>
+        <h2 className="mb-3 font-semibold">Create service</h2>
+        <form
+          action={async (formData) => {
+            "use server";
+            await createServiceAction(formData);
+          }}
+          className="grid gap-3 md:grid-cols-2"
+        >
+          <div>
+            <Label htmlFor="slug">Slug</Label>
+            <Input id="slug" name="slug" required placeholder="electromechanical" />
+          </div>
+          <div>
+            <Label htmlFor="sort_order">Sort order</Label>
+            <Input id="sort_order" name="sort_order" type="number" defaultValue={0} />
+          </div>
+          <div>
+            <Label htmlFor="title_en">Title EN</Label>
+            <Input id="title_en" name="title_en" required />
+          </div>
+          <div>
+            <Label htmlFor="title_ar">Title AR</Label>
+            <Input id="title_ar" name="title_ar" required dir="rtl" />
+          </div>
+          <div>
+            <Label htmlFor="summary_en">Summary EN</Label>
+            <Textarea id="summary_en" name="summary_en" />
+          </div>
+          <div>
+            <Label htmlFor="summary_ar">Summary AR</Label>
+            <Textarea id="summary_ar" name="summary_ar" dir="rtl" />
+          </div>
+          <ImageUploadField name="cover_image_url" label="Cover image" className="md:col-span-2" />
+          <IconSelect name="icon" label="Icon" className="md:col-span-2" />
+          <label className="flex items-center gap-2 text-sm">
+            <input type="checkbox" name="is_featured" /> Featured
+          </label>
+          <label className="flex items-center gap-2 text-sm">
+            <input type="checkbox" name="is_published" defaultChecked /> Published
+          </label>
+          <Button type="submit" variant="accent">
+            Create
+          </Button>
+        </form>
+      </Card>
+
+      <div className="space-y-4">
+        {await Promise.all(
+          services.map(async (service) => {
+            const tr = await loadTranslations(service.id);
+            return (
+              <Card key={service.id}>
+                <form
+                  action={async (formData) => {
+                    "use server";
+                    await updateServiceAction(formData);
+                  }}
+                  className="grid gap-3 md:grid-cols-2"
+                >
+                  <input type="hidden" name="id" value={service.id} />
+                  <div>
+                    <Label>Slug</Label>
+                    <Input name="slug" defaultValue={service.slug} />
+                  </div>
+                  <div>
+                    <Label>Sort</Label>
+                    <Input name="sort_order" type="number" defaultValue={service.sort_order} />
+                  </div>
+                  <div>
+                    <Label>Title EN</Label>
+                    <Input name="title_en" defaultValue={tr.en?.title ?? service.title} />
+                  </div>
+                  <div>
+                    <Label>Title AR</Label>
+                    <Input name="title_ar" defaultValue={tr.ar?.title ?? ""} dir="rtl" />
+                  </div>
+                  <div>
+                    <Label>Summary EN</Label>
+                    <Textarea name="summary_en" defaultValue={tr.en?.summary ?? service.summary ?? ""} />
+                  </div>
+                  <div>
+                    <Label>Summary AR</Label>
+                    <Textarea name="summary_ar" defaultValue={tr.ar?.summary ?? ""} dir="rtl" />
+                  </div>
+                  <div>
+                    <Label>Description EN</Label>
+                    <Textarea name="description_en" defaultValue={tr.en?.description ?? ""} />
+                  </div>
+                  <div>
+                    <Label>Description AR</Label>
+                    <Textarea name="description_ar" defaultValue={tr.ar?.description ?? ""} dir="rtl" />
+                  </div>
+                  <ImageUploadField
+                    name="cover_image_url"
+                    label="Cover image"
+                    defaultValue={service.cover_image_url}
+                    className="md:col-span-2"
+                  />
+                  <IconSelect
+                    name="icon"
+                    label="Icon"
+                    defaultValue={service.icon}
+                    className="md:col-span-2"
+                  />
+                  <label className="flex items-center gap-2 text-sm">
+                    <input type="checkbox" name="is_featured" defaultChecked={service.is_featured} /> Featured
+                  </label>
+                  <label className="flex items-center gap-2 text-sm">
+                    <input type="checkbox" name="is_published" defaultChecked={service.is_published} /> Published
+                  </label>
+                  <div className="flex gap-2 md:col-span-2">
+                    <Button type="submit" variant="accent">
+                      Save
+                    </Button>
+                  </div>
+                </form>
+                <form
+                  action={async () => {
+                    "use server";
+                    await deleteServiceAction(service.id);
+                  }}
+                  className="mt-2"
+                >
+                  <Button type="submit" variant="ghost" size="sm">
+                    Soft delete
+                  </Button>
+                </form>
+              </Card>
+            );
+          }),
+        )}
       </div>
     </div>
   );
