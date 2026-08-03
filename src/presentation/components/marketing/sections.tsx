@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence, useInView, useMotionValue, useSpring } from "framer-motion";
-import type { AboutStat, AboutValue, HomepageSection, HomepageSlide, ServiceItem } from "@/types/cms";
+import type { AboutValue, HomepageSection, HomepageSlide, ServiceItem } from "@/types/cms";
 import { Button } from "@/presentation/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
@@ -179,7 +179,7 @@ export function HeroSlider({
       {/* Soft top veil so fixed white nav stays readable; keep the architecture visible */}
       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,16,28,0.55)_0%,rgba(6,16,28,0.12)_18%,rgba(255,255,255,0.2)_42%,rgba(247,245,242,0.55)_100%)]" />
 
-      <div className="relative container-mt flex min-h-[100svh] flex-col justify-end px-4 pb-16 pt-[calc(var(--header-height)+2rem)] md:justify-center md:pb-24">
+      <div className="relative container-mt flex min-h-[100svh] flex-col justify-end px-[var(--page-gutter)] pb-[max(4rem,calc(env(safe-area-inset-bottom,0px)+3rem))] pt-[calc(var(--header-height)+2rem+env(safe-area-inset-top,0px))] md:justify-center md:pb-24">
         <motion.p
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
@@ -216,7 +216,7 @@ export function HeroSlider({
         </AnimatePresence>
 
         {slides.length > 1 ? (
-          <div className="mt-12 flex items-center gap-3" role="tablist" aria-label="Hero slides">
+          <div className="mt-12 flex items-center gap-1" role="tablist" aria-label="Hero slides">
             {slides.map((s, i) => (
               <button
                 key={s.id}
@@ -225,11 +225,15 @@ export function HeroSlider({
                 aria-selected={i === index}
                 aria-label={`Slide ${i + 1}`}
                 onClick={() => setIndex(i)}
-                className={cn(
-                  "h-px transition-all duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]",
-                  i === index ? "w-12 bg-[var(--accent)]" : "w-6 bg-[var(--primary)]/25 hover:bg-[var(--primary)]/45",
-                )}
-              />
+                className="inline-flex min-h-11 min-w-11 items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+              >
+                <span
+                  className={cn(
+                    "h-px transition-all duration-500",
+                    i === index ? "w-12 bg-[var(--accent)]" : "w-6 bg-[var(--primary)]/25",
+                  )}
+                />
+              </button>
             ))}
           </div>
         ) : null}
@@ -257,29 +261,27 @@ function AnimatedStatValue({ value }: { value: string }) {
   const parsed = parseStat(value);
   const motionValue = useMotionValue(0);
   const spring = useSpring(motionValue, { stiffness: 60, damping: 20 });
+  const isStatic = !Number.isFinite(parsed.number) || parsed.number === 0;
   const [display, setDisplay] = useState(value);
 
   useEffect(() => {
-    if (!inView || !Number.isFinite(parsed.number) || parsed.number === 0) return;
+    if (!inView || isStatic) return;
     motionValue.set(0);
     motionValue.set(parsed.number);
-  }, [inView, motionValue, parsed.number]);
+  }, [inView, isStatic, motionValue, parsed.number]);
 
   useEffect(() => {
-    if (!Number.isFinite(parsed.number) || parsed.number === 0) {
-      setDisplay(value);
-      return;
-    }
+    if (isStatic) return;
     return spring.on("change", (latest) => {
       const formatted =
         parsed.decimals > 0 ? latest.toFixed(parsed.decimals) : Math.round(latest).toString();
       setDisplay(`${parsed.prefix}${formatted}${parsed.suffix}`);
     });
-  }, [parsed.decimals, parsed.number, parsed.prefix, parsed.suffix, spring, value]);
+  }, [isStatic, parsed.decimals, parsed.prefix, parsed.suffix, spring]);
 
   return (
     <span ref={ref} className="stat-value">
-      {display}
+      {isStatic ? value : display}
     </span>
   );
 }
@@ -312,7 +314,7 @@ export function StatsCounter({
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.08, duration: 0.5 }}
-                className="border-s border-[var(--line)] ps-5"
+                className="border-s border-[var(--line)] ps-5 min-w-0"
               >
                 <p className="font-display text-[clamp(2.25rem,5vw,3.75rem)] font-semibold tracking-tight text-[var(--primary)]">
                   <AnimatedStatValue value={item.value} />
@@ -524,11 +526,11 @@ export function ServiceCard({
             </p>
           </div>
 
-          <div className="mt-8 flex items-center justify-between border-t border-[var(--line)] pt-5">
-            <span className="text-[0.65rem] font-semibold tracking-[0.2em] uppercase text-[var(--primary)]/55 transition group-hover:text-[var(--accent)]">
+          <div className="mt-8 flex min-w-0 items-center justify-between gap-3 border-t border-[var(--line)] pt-5">
+            <span className="min-w-0 text-[0.65rem] font-semibold tracking-[0.2em] uppercase text-[var(--primary)]/55 transition group-hover:text-[var(--accent)] rtl:tracking-normal">
               {locale === "ar" ? "استكشف الخدمة" : "Explore system"}
             </span>
-            <span className="inline-flex h-9 w-9 items-center justify-center border border-[var(--line)] text-[var(--primary)] transition group-hover:border-[var(--accent)] group-hover:bg-[var(--accent)] group-hover:text-white">
+            <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center border border-[var(--line)] text-[var(--primary)] transition group-hover:border-[var(--accent)] group-hover:bg-[var(--accent)] group-hover:text-white">
               <ArrowUpRight className="h-4 w-4" aria-hidden />
             </span>
           </div>
@@ -577,7 +579,7 @@ export function CtaBanner({ section, locale }: { section: HomepageSection; local
               </span>
             </div>
 
-            <h2 className="font-display text-h2 max-w-[18ch] font-semibold tracking-tight text-balance">
+            <h2 className="font-display text-h2 max-w-xl font-semibold tracking-tight text-balance rtl:max-w-2xl">
               {section.title}
             </h2>
             {section.subtitle ? (
@@ -639,16 +641,18 @@ export function ContactMap({ embedUrl }: { embedUrl: string | null }) {
 export function TextBlock({ section }: { section: HomepageSection }) {
   return (
     <section className="section-pad">
-      <div className="container-mt max-w-3xl">
-        <SectionHeading title={section.title} subtitle={section.subtitle} />
-        {section.body ? (
-          <p className="text-lg leading-relaxed text-[var(--muted-foreground)]">{section.body}</p>
-        ) : null}
-        {section.cta_href && section.cta_label ? (
-          <Link href={section.cta_href} className="mt-6 inline-block">
-            <Button variant="outline">{section.cta_label}</Button>
-          </Link>
-        ) : null}
+      <div className="container-mt">
+        <div className="max-w-3xl">
+          <SectionHeading title={section.title} subtitle={section.subtitle} />
+          {section.body ? (
+            <p className="text-lg leading-relaxed text-[var(--muted-foreground)]">{section.body}</p>
+          ) : null}
+          {section.cta_href && section.cta_label ? (
+            <Link href={section.cta_href} className="mt-6 inline-block">
+              <Button variant="outline">{section.cta_label}</Button>
+            </Link>
+          ) : null}
+        </div>
       </div>
     </section>
   );
@@ -844,25 +848,27 @@ export function PageHero({
   return (
     <section className="page-hero">
       <MediaFill src={imageSrc} priority sizes="100vw" />
-      <div className="container-mt max-w-3xl">
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="font-display text-h1 font-semibold tracking-tight"
-        >
-          {title}
-        </motion.h1>
-        {subtitle ? (
-          <motion.p
-            initial={{ opacity: 0, y: 16 }}
+      <div className="container-mt">
+        <div className="max-w-3xl">
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.12 }}
-            className="mt-5 max-w-2xl text-base leading-relaxed text-white/75 md:text-lg"
+            transition={{ duration: 0.6 }}
+            className="font-display text-h1 font-semibold tracking-tight"
           >
-            {subtitle}
-          </motion.p>
-        ) : null}
+            {title}
+          </motion.h1>
+          {subtitle ? (
+            <motion.p
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.12 }}
+              className="mt-5 max-w-2xl text-base leading-relaxed text-white/75 md:text-lg"
+            >
+              {subtitle}
+            </motion.p>
+          ) : null}
+        </div>
       </div>
     </section>
   );

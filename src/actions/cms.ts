@@ -1,7 +1,6 @@
 "use server";
 
 import { revalidatePath, revalidateTag } from "next/cache";
-import { createClient } from "@/infrastructure/supabase/server";
 import { createAdminClient } from "@/infrastructure/supabase/admin";
 import { themeUpdateSchema } from "@/lib/validations";
 import { requirePermission, writeAuditLog } from "@/lib/permissions";

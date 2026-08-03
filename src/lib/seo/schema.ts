@@ -9,6 +9,7 @@ export function organizationJsonLd() {
     name: "Master Touch",
     alternateName: "ماستر تاتش",
     url: "https://www.mastertouchksa.com",
+    logo: `${baseUrl()}/images/logo-master-touch.png`,
     email: "info@mastertouchksa.com",
     telephone: "+966-50-683-4610",
     address: {

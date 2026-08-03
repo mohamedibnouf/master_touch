@@ -1,5 +1,4 @@
 import { unstable_cache } from "next/cache";
-import { createClient } from "@/infrastructure/supabase/server";
 import { createAdminClient } from "@/infrastructure/supabase/admin";
 import { createPublicClient } from "@/infrastructure/supabase/public";
 import { isSupabaseConfigured } from "@/infrastructure/supabase/config";

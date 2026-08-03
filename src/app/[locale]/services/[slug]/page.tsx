@@ -90,7 +90,8 @@ export default async function ServiceDetailPage({
         imageSrc={service.cover_image_url || "/images/placeholders/hero-1.svg"}
       />
       <section className="section-pad">
-        <div className="container-mt max-w-3xl">
+        <div className="container-mt">
+          <div className="max-w-3xl">
           <p className="text-lg leading-relaxed text-[var(--muted-foreground)] md:text-xl">
             {service.description}
           </p>
@@ -100,6 +101,7 @@ export default async function ServiceDetailPage({
               <ArrowUpRight className="h-4 w-4" aria-hidden />
             </Button>
           </Link>
+          </div>
         </div>
       </section>
       {related.length ? (
@@ -108,7 +110,7 @@ export default async function ServiceDetailPage({
             <h2 className="mb-8 font-display text-h2 font-semibold tracking-tight text-[var(--primary)] md:mb-10">
               {t("relatedServices")}
             </h2>
-            <div className="grid gap-5 md:grid-cols-3">
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {related.map((s, i) => (
                 <ServiceCard key={s.id} service={s} locale={locale} index={i} />
               ))}

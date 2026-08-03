@@ -19,7 +19,7 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4 px-4 pt-24 text-center">
+    <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4 px-[var(--page-gutter)] pt-24 text-center">
       <h1 className="font-display text-3xl text-[var(--primary)]">{t("error")}</h1>
       <p className="max-w-md text-sm text-[var(--muted-foreground)]">{error.message}</p>
       <Button variant="accent" onClick={reset}>

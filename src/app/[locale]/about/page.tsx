@@ -121,7 +121,8 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
       </section>
 
       <section className="section-pad">
-        <div className="container-mt max-w-3xl">
+        <div className="container-mt">
+          <div className="max-w-3xl">
           <SectionHeading title={t("ceoMessage")} />
           <blockquote className="border border-[var(--line)] bg-[var(--surface)] p-8 md:p-12">
             <p className="font-display text-[clamp(1.35rem,3vw,1.85rem)] leading-relaxed text-[var(--primary)]">
@@ -132,6 +133,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
               {about.ceo_title ? ` — ${about.ceo_title}` : null}
             </footer>
           </blockquote>
+          </div>
         </div>
       </section>
 

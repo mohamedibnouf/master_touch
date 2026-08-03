@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
 import { Menu, Moon, Sun, X, Mail, Phone, Globe, MapPin, ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/presentation/components/shared/ThemeProvider";
+import { BrandLogo } from "@/presentation/components/shared/BrandLogo";
 
 export function LocaleSwitcher({ compact }: { compact?: boolean }) {
   const locale = useLocale();
@@ -69,9 +70,11 @@ export function LocaleSwitcher({ compact }: { compact?: boolean }) {
 
 function ThemeQuickToggle({ light }: { light?: boolean }) {
   const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => setMounted(true), []);
+  const mounted = useSyncExternalStore(
+    () => () => undefined,
+    () => true,
+    () => false,
+  );
 
   if (!mounted) {
     return <span className="inline-block h-11 w-11" aria-hidden />;
@@ -126,10 +129,6 @@ export function SiteHeader({ brand }: { brand: string }) {
   }, []);
 
   useEffect(() => {
-    setOpen(false);
-  }, [pathname]);
-
-  useEffect(() => {
     if (!open) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -153,7 +152,7 @@ export function SiteHeader({ brand }: { brand: string }) {
       </a>
       <header
         className={cn(
-          "fixed inset-x-0 top-0 z-50 transition-all duration-500",
+          "fixed inset-x-0 top-0 z-50 pt-[env(safe-area-inset-top,0px)] transition-all duration-500",
           scrolled || open
             ? "border-b border-white/10 bg-[color-mix(in_oklab,#06101c_94%,transparent)] backdrop-blur-md"
             : "border-b border-transparent bg-gradient-to-b from-[rgba(6,16,28,0.72)] to-transparent",
@@ -162,11 +161,16 @@ export function SiteHeader({ brand }: { brand: string }) {
         <div className="container-mt flex h-[var(--header-height)] items-center justify-between gap-3 px-[var(--page-gutter)]">
           <Link
             href={`/${locale}`}
-            className="min-w-0 truncate font-display text-[clamp(1.15rem,3.5vw,1.65rem)] font-semibold tracking-[0.04em] text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+            className="relative flex min-w-0 shrink items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+            aria-label={brand}
           >
-            {brand}
+            <BrandLogo
+              priority
+              className="h-10 w-[7.5rem] max-w-full sm:h-11 sm:w-[9.5rem]"
+              sizes="(max-width:640px) 120px, 152px"
+            />
           </Link>
-          <nav className="hidden items-center gap-5 lg:gap-8 md:flex" aria-label="Primary">
+          <nav className="hidden items-center gap-5 lg:flex lg:gap-8" aria-label="Primary">
             {links.map((link) => {
               const active =
                 pathname === link.href ||
@@ -176,7 +180,7 @@ export function SiteHeader({ brand }: { brand: string }) {
                   key={link.href}
                   href={link.href}
                   className={cn(
-                    "relative whitespace-nowrap text-[0.72rem] font-medium tracking-[0.12em] uppercase transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] lg:text-[0.8rem]",
+                    "relative whitespace-nowrap text-[0.8rem] font-medium tracking-[0.12em] uppercase transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] rtl:tracking-normal",
                     active ? "text-white" : "text-white/65 hover:text-white",
                   )}
                   aria-current={active ? "page" : undefined}
@@ -194,13 +198,13 @@ export function SiteHeader({ brand }: { brand: string }) {
             <LocaleSwitcher />
             <Link
               href={`/${locale}/contact`}
-              className="hidden min-h-11 items-center border border-white/25 px-4 text-[0.7rem] font-semibold tracking-[0.16em] uppercase text-white transition hover:border-white hover:bg-white hover:text-[var(--primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] lg:inline-flex"
+              className="hidden min-h-11 items-center border border-white/25 px-4 text-[0.7rem] font-semibold tracking-[0.16em] uppercase text-white transition hover:border-white hover:bg-white hover:text-[var(--primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] lg:inline-flex rtl:tracking-normal"
             >
               {t("contact")}
             </Link>
             <button
               type="button"
-              className="inline-flex h-11 w-11 items-center justify-center border border-white/20 text-white md:hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+              className="inline-flex h-11 w-11 items-center justify-center border border-white/20 text-white lg:hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
               aria-expanded={open}
               aria-controls="mobile-nav"
               aria-label={open ? common("closeMenu") : common("openMenu")}
@@ -213,7 +217,7 @@ export function SiteHeader({ brand }: { brand: string }) {
       </header>
 
       {open ? (
-        <div className="fixed inset-0 z-40 md:hidden" role="dialog" aria-modal="true">
+        <div className="fixed inset-0 z-40 lg:hidden" role="dialog" aria-modal="true">
           <button
             type="button"
             className="absolute inset-0 bg-black/55"
@@ -283,9 +287,9 @@ export function SiteFooter({
         <div className="grid gap-12 lg:grid-cols-12 lg:gap-10">
           <div className="min-w-0 lg:col-span-5">
             <p className="font-display text-[0.65rem] tracking-[0.22em] text-[var(--accent)]">MT / FOOTER</p>
-            <p className="mt-4 font-display text-[clamp(2rem,5vw,3.35rem)] font-semibold tracking-tight text-white">
-              {brand}
-            </p>
+            <Link href={`/${locale}`} className="mt-4 inline-flex" aria-label={brand}>
+              <BrandLogo className="h-16 w-[13rem] sm:h-[4.5rem] sm:w-[15rem]" sizes="240px" />
+            </Link>
             <p className="mt-5 max-w-md text-sm leading-relaxed text-white/60">
               {tagline || t("tagline")}
             </p>
@@ -342,7 +346,7 @@ export function SiteFooter({
                     target="_blank"
                   >
                     <Globe className="h-3.5 w-3.5 shrink-0 text-[var(--accent)]" aria-hidden />
-                    www.mastertouchksa.com
+                    <span className="break-all">www.mastertouchksa.com</span>
                   </a>
                 </li>
               </ul>
@@ -374,7 +378,7 @@ export function SiteFooter({
       </div>
 
       <div className="relative z-[1] border-t border-white/10">
-        <div className="container-mt flex flex-col gap-4 px-[var(--page-gutter)] py-5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="container-mt flex flex-col gap-4 px-[var(--page-gutter)] py-5 pb-[max(1.25rem,env(safe-area-inset-bottom,0px))] sm:flex-row sm:items-center sm:justify-between">
           <p className="text-center text-xs text-white/45 sm:text-start">
             © {year} {brand}. {t("rights")}
           </p>

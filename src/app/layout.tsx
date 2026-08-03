@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Syne, Source_Sans_3 } from "next/font/google";
 import { ThemeProvider } from "@/presentation/components/shared/ThemeProvider";
 import { THEME_BOOTSTRAP_SCRIPT } from "@/presentation/components/shared/theme-bootstrap";
@@ -24,6 +24,17 @@ export const metadata: Metadata = {
   description:
     "Electromechanical works, architectural finishing, and smart solutions in Saudi Arabia.",
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "https://www.mastertouchksa.com"),
+  icons: {
+    icon: [{ url: "/images/logo-master-touch.png", type: "image/png" }],
+    apple: [{ url: "/images/logo-master-touch.png" }],
+    shortcut: ["/images/logo-master-touch.png"],
+  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -6,7 +6,7 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useState,
+  useSyncExternalStore,
 } from "react";
 import { THEME_STORAGE_KEY } from "@/presentation/components/shared/theme-bootstrap";
 
@@ -18,6 +18,7 @@ type ThemeContextValue = {
 };
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
+const THEME_EVENT = "mt-theme-change";
 
 function getSystemTheme(): "light" | "dark" {
   return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
@@ -31,27 +32,37 @@ function applyTheme(theme: ThemeMode) {
   root.style.colorScheme = resolved;
 }
 
+function readStoredTheme(): ThemeMode {
+  return (localStorage.getItem(THEME_STORAGE_KEY) as ThemeMode | null) ?? "system";
+}
+
+function subscribeTheme(onStoreChange: () => void) {
+  const onStorage = (event: StorageEvent) => {
+    if (event.key === THEME_STORAGE_KEY || event.key === null) onStoreChange();
+  };
+  const onCustom = () => onStoreChange();
+  const media = window.matchMedia("(prefers-color-scheme: dark)");
+  window.addEventListener("storage", onStorage);
+  window.addEventListener(THEME_EVENT, onCustom);
+  media.addEventListener("change", onCustom);
+  return () => {
+    window.removeEventListener("storage", onStorage);
+    window.removeEventListener(THEME_EVENT, onCustom);
+    media.removeEventListener("change", onCustom);
+  };
+}
+
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<ThemeMode>("system");
+  const theme = useSyncExternalStore(subscribeTheme, readStoredTheme, () => "system" as ThemeMode);
 
   useEffect(() => {
-    const stored = (localStorage.getItem(THEME_STORAGE_KEY) as ThemeMode | null) ?? "system";
-    setThemeState(stored);
-    applyTheme(stored);
-
-    const media = window.matchMedia("(prefers-color-scheme: dark)");
-    const onSystemChange = () => {
-      const current = (localStorage.getItem(THEME_STORAGE_KEY) as ThemeMode | null) ?? "system";
-      if (current === "system") applyTheme("system");
-    };
-    media.addEventListener("change", onSystemChange);
-    return () => media.removeEventListener("change", onSystemChange);
-  }, []);
+    applyTheme(theme);
+  }, [theme]);
 
   const setTheme = useCallback((next: ThemeMode) => {
     localStorage.setItem(THEME_STORAGE_KEY, next);
-    setThemeState(next);
     applyTheme(next);
+    window.dispatchEvent(new Event(THEME_EVENT));
   }, []);
 
   const value = useMemo(() => ({ theme, setTheme }), [theme, setTheme]);

@@ -62,7 +62,7 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
                   ) : null}
                   <div>
                     <p className="text-xs tracking-wide text-[var(--muted-foreground)]">{c.label}</p>
-                    <p className="text-sm font-medium text-[var(--foreground)]" dir="ltr">
+                    <p className="text-sm font-medium break-all text-[var(--foreground)]" dir="ltr">
                       {c.value}
                     </p>
                   </div>
