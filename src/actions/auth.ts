@@ -76,7 +76,8 @@ export async function forgotPasswordAction(email: string, locale = "ar") {
     await assertRateLimit(parsed.data, { name: "forgot", limit: 5, window: "60 s" });
 
     const supabase = await createClient();
-    const redirectTo = `${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"}/${locale}/reset-password`;
+    const appUrl = (process.env.NEXT_PUBLIC_APP_URL ?? "https://www.mastertouchksa.com").replace(/\/+$/, "");
+    const redirectTo = `${appUrl}/${locale}/reset-password`;
     const { error } = await supabase.auth.resetPasswordForEmail(parsed.data, { redirectTo });
     if (error) throw new AuthenticationError(error.message);
     await writeAuditLog("auth.forgot_password", "profiles");

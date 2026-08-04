@@ -2,10 +2,16 @@
   "name": "master-touch",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
+    "dev": "next dev --webpack",
+    "build": "next build --webpack",
+    "start": "node server.js",
+    "start:next": "next start",
+    "deploy:cpanel": "bash scripts/deploy-cpanel.sh",
+    "postbuild": "node scripts/postbuild-standalone.mjs",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
