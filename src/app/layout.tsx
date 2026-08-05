@@ -1,10 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import { Syne, Source_Sans_3 } from "next/font/google";
+import { Outfit, Source_Sans_3 } from "next/font/google";
 import { ThemeProvider } from "@/presentation/components/shared/ThemeProvider";
 import { THEME_BOOTSTRAP_SCRIPT } from "@/presentation/components/shared/theme-bootstrap";
 import "./globals.css";
 
-const syne = Syne({
+const outfit = Outfit({
   subsets: ["latin"],
   variable: "--font-syne",
   weight: ["500", "600", "700", "800"],
@@ -46,7 +46,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP_SCRIPT }}
         />
       </head>
-      <body className={`${syne.variable} ${sourceSans.variable} antialiased`}>
+      <body className={`${outfit.variable} ${sourceSans.variable} antialiased`}>
         <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>

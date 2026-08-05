@@ -1,32 +1,36 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f7f5f2;
-  --foreground: #0c1520;
-  --primary: #0a1c33;
-  --primary-foreground: #f7f5f2;
-  --secondary: #14304f;
-  --accent: #c45c1a;
+  /* Premium engineering palette — Deep Navy + Royal Blue */
+  --background: #f4f6f9;
+  --foreground: #0a1628;
+  --primary: #0a1b33;
+  --primary-foreground: #ffffff;
+  --secondary: #132a4a;
+  --accent: #1e5eff;
   --accent-foreground: #ffffff;
-  --muted: #ebe6df;
-  --muted-foreground: #5c6670;
-  --border: #d9d2c8;
+  --muted: #e8edf3;
+  --muted-foreground: #5a6b7d;
+  --border: #d5dde8;
   --surface: #ffffff;
-  --surface-elevated: #fffcf8;
-  --line: rgba(10, 28, 51, 0.12);
-  --radius: 0.25rem;
-  --ring: #c45c1a;
-  --shadow-soft: 0 24px 60px rgba(10, 28, 51, 0.08);
-  --header-height: clamp(3.75rem, 7vw, 4.5rem);
-  --page-gutter: clamp(1.5rem, 5vw, 3rem);
-  --container-max: min(1180px, 100%);
-  --section-space-y: clamp(3.25rem, 8vw, 8rem);
+  --surface-elevated: #fbfcfe;
+  --line: rgba(10, 27, 51, 0.1);
+  --radius: 0.125rem;
+  --ring: #1e5eff;
+  --success: #059669;
+  --warning: #d97706;
+  --shadow-soft: 0 20px 50px rgba(10, 27, 51, 0.08);
+  --shadow-lift: 0 28px 64px rgba(10, 27, 51, 0.12);
+  --header-height: clamp(4rem, 7vw, 4.75rem);
+  --page-gutter: clamp(1.5rem, 5vw, 3.25rem);
+  --container-max: min(1200px, 100%);
+  --section-space-y: clamp(3.75rem, 9vw, 8.5rem);
   --touch: 2.75rem; /* 44px */
   --text-body: clamp(0.95rem, 0.9rem + 0.25vw, 1.0625rem);
   --text-body-lg: clamp(1.05rem, 1rem + 0.4vw, 1.25rem);
-  --text-h2: clamp(1.75rem, 1.2rem + 2.2vw, 3.15rem);
-  --text-h1: clamp(2rem, 1.35rem + 3vw, 4.25rem);
-  --text-display: clamp(2.35rem, 1.2rem + 6vw, 6.5rem);
+  --text-h2: clamp(1.85rem, 1.25rem + 2.2vw, 3.25rem);
+  --text-h1: clamp(2.15rem, 1.4rem + 3vw, 4.5rem);
+  --text-display: clamp(2.5rem, 1.3rem + 5.5vw, 6.25rem);
   --text-small: clamp(0.75rem, 0.72rem + 0.15vw, 0.875rem);
 }
 
@@ -44,18 +48,19 @@
 
 .dark {
   --background: #060d16;
-  --foreground: #e8e4de;
+  --foreground: #e8eef6;
   --primary: #0f2744;
-  --primary-foreground: #f7f5f2;
-  --secondary: #0a1c33;
-  --accent: #e07a2f;
-  --muted: #101b29;
-  --muted-foreground: #9aa4af;
+  --primary-foreground: #f4f6f9;
+  --secondary: #0a1b33;
+  --accent: #4d8bff;
+  --muted: #0e1826;
+  --muted-foreground: #9aa8b8;
   --border: #1c2a3a;
   --surface: #0b1522;
   --surface-elevated: #122033;
-  --line: rgba(232, 228, 222, 0.12);
+  --line: rgba(232, 238, 246, 0.12);
   --shadow-soft: 0 24px 60px rgba(0, 0, 0, 0.35);
+  --shadow-lift: 0 28px 64px rgba(0, 0, 0, 0.45);
 }
 
 @theme inline {
@@ -91,10 +96,10 @@ html {
 
 body {
   background:
-    radial-gradient(1200px 600px at 10% -10%, rgba(196, 92, 26, 0.06), transparent 55%),
-    linear-gradient(180deg, var(--background), color-mix(in oklab, var(--background) 88%, var(--muted)));
+    radial-gradient(1100px 520px at 12% -8%, rgba(30, 94, 255, 0.05), transparent 55%),
+    linear-gradient(180deg, var(--background), color-mix(in oklab, var(--background) 92%, var(--muted)));
   color: var(--foreground);
-  font-family: var(--font-source), "Segoe UI", sans-serif;
+  font-family: var(--font-source), "Segoe UI", Tahoma, sans-serif;
   font-size: var(--text-body);
   line-height: 1.65;
   min-height: 100vh;
@@ -278,19 +283,19 @@ iframe {
 }
 
 .mt-panel-dark {
-  background: linear-gradient(145deg, #0a1c33 0%, #14304f 55%, #0a1c33 100%);
-  color: #f7f5f2;
+  background: linear-gradient(145deg, #0a1b33 0%, #132a4a 55%, #0a1b33 100%);
+  color: #f4f6f9;
 }
 
 .cta-engineering {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  color: #f7f5f2;
+  color: #f4f6f9;
   background:
-    radial-gradient(720px 360px at 100% 0%, rgba(196, 92, 26, 0.22), transparent 55%),
-    radial-gradient(640px 320px at 0% 100%, rgba(20, 48, 79, 0.9), transparent 50%),
-    linear-gradient(135deg, #06101c 0%, #0a1c33 45%, #122a45 100%);
+    radial-gradient(720px 360px at 100% 0%, rgba(30, 94, 255, 0.28), transparent 55%),
+    radial-gradient(640px 320px at 0% 100%, rgba(19, 42, 74, 0.95), transparent 50%),
+    linear-gradient(135deg, #06101c 0%, #0a1b33 48%, #123056 100%);
   border: 1px solid color-mix(in oklab, white 12%, transparent);
 }
 
@@ -338,7 +343,7 @@ iframe {
   top: -20%;
   width: min(42%, 28rem);
   height: 140%;
-  background: linear-gradient(160deg, transparent 10%, rgba(196, 92, 26, 0.16) 45%, transparent 80%);
+  background: linear-gradient(160deg, transparent 10%, rgba(30, 94, 255, 0.18) 45%, transparent 80%);
   transform: skewX(-18deg);
   pointer-events: none;
 }
@@ -359,7 +364,7 @@ iframe {
   content: "";
   position: absolute;
   inset: 12%;
-  border: 1px solid rgba(196, 92, 26, 0.45);
+  border: 1px solid rgba(30, 94, 255, 0.45);
 }
 
 .cta-engineering__frame::after {
@@ -381,7 +386,7 @@ iframe {
 
 .site-footer {
   background:
-    radial-gradient(900px 420px at 100% -10%, rgba(196, 92, 26, 0.12), transparent 55%),
+    radial-gradient(900px 420px at 100% -10%, rgba(30, 94, 255, 0.14), transparent 55%),
     linear-gradient(180deg, #07111d 0%, #06101c 55%, #050d16 100%);
 }
 
@@ -482,7 +487,7 @@ iframe {
 
 .hero-gradient {
   background:
-    linear-gradient(135deg, #06101c 0%, #0a1c33 42%, #14304f 78%, #0a1c33 100%);
+    linear-gradient(135deg, #06101c 0%, #0a1b33 42%, #1e5eff 120%);
 }
 
 .glass {
@@ -498,8 +503,8 @@ iframe {
 .page-hero {
   position: relative;
   overflow: hidden;
-  color: #f7f5f2;
-  padding-block: clamp(6.5rem, 14vw, 11rem) clamp(2.75rem, 7vw, 5.5rem);
+  color: #f4f6f9;
+  padding-block: clamp(7rem, 15vw, 12rem) clamp(3rem, 7vw, 5.75rem);
   padding-inline: var(--page-gutter);
 }
 
@@ -508,8 +513,8 @@ iframe {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(120deg, rgba(6, 16, 28, 0.92) 0%, rgba(10, 28, 51, 0.78) 55%, rgba(20, 48, 79, 0.55) 100%),
-    linear-gradient(to bottom, transparent 60%, rgba(6, 16, 28, 0.55));
+    linear-gradient(115deg, rgba(6, 16, 28, 0.94) 0%, rgba(10, 27, 51, 0.78) 48%, rgba(30, 94, 255, 0.35) 100%),
+    linear-gradient(to bottom, transparent 55%, rgba(6, 16, 28, 0.65));
   z-index: 1;
 }
 
@@ -527,8 +532,8 @@ iframe {
   isolation: isolate;
   overflow: hidden;
   background:
-    radial-gradient(900px 420px at 8% 0%, rgba(196, 92, 26, 0.08), transparent 55%),
-    radial-gradient(700px 380px at 100% 20%, rgba(10, 28, 51, 0.06), transparent 50%),
+    radial-gradient(900px 420px at 8% 0%, rgba(30, 94, 255, 0.07), transparent 55%),
+    radial-gradient(700px 380px at 100% 20%, rgba(10, 27, 51, 0.05), transparent 50%),
     var(--muted);
 }
 
@@ -703,9 +708,9 @@ iframe {
 
 @media (hover: hover) and (pointer: fine) {
   .service-module:hover {
-    border-color: color-mix(in oklab, var(--accent) 50%, var(--primary));
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-soft);
+    border-color: color-mix(in oklab, var(--accent) 55%, var(--primary));
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-lift);
   }
 
   .service-module:hover::before,

@@ -154,8 +154,8 @@ export function SiteHeader({ brand }: { brand: string }) {
         className={cn(
           "fixed inset-x-0 top-0 z-50 pt-[env(safe-area-inset-top,0px)] transition-all duration-500",
           scrolled || open
-            ? "border-b border-white/10 bg-[color-mix(in_oklab,#06101c_94%,transparent)] backdrop-blur-md"
-            : "border-b border-transparent bg-gradient-to-b from-[rgba(6,16,28,0.72)] to-transparent",
+            ? "border-b border-white/10 bg-[color-mix(in_oklab,#06101c_92%,transparent)] shadow-[0_12px_40px_rgba(0,0,0,0.25)] backdrop-blur-xl"
+            : "border-b border-transparent bg-gradient-to-b from-[rgba(6,16,28,0.78)] via-[rgba(6,16,28,0.35)] to-transparent",
         )}
       >
         <div className="container-mt flex h-[var(--header-height)] items-center justify-between gap-3 px-[var(--page-gutter)]">
@@ -170,7 +170,7 @@ export function SiteHeader({ brand }: { brand: string }) {
               sizes="(max-width:640px) 120px, 152px"
             />
           </Link>
-          <nav className="hidden items-center gap-5 lg:flex lg:gap-8" aria-label="Primary">
+          <nav className="hidden items-center gap-1 lg:flex lg:gap-1" aria-label="Primary">
             {links.map((link) => {
               const active =
                 pathname === link.href ||
@@ -180,14 +180,14 @@ export function SiteHeader({ brand }: { brand: string }) {
                   key={link.href}
                   href={link.href}
                   className={cn(
-                    "relative whitespace-nowrap text-[0.8rem] font-medium tracking-[0.12em] uppercase transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] rtl:tracking-normal",
+                    "relative whitespace-nowrap px-3.5 py-2 text-[0.78rem] font-medium tracking-[0.1em] uppercase transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] rtl:tracking-normal",
                     active ? "text-white" : "text-white/65 hover:text-white",
                   )}
                   aria-current={active ? "page" : undefined}
                 >
                   {link.label}
                   {active ? (
-                    <span className="absolute -bottom-2 inset-x-0 mx-auto h-px w-full bg-[var(--accent)]" />
+                    <span className="absolute -bottom-0.5 inset-x-3 mx-auto h-0.5 rounded-full bg-[var(--accent)]" />
                   ) : null}
                 </Link>
               );
@@ -198,13 +198,13 @@ export function SiteHeader({ brand }: { brand: string }) {
             <LocaleSwitcher />
             <Link
               href={`/${locale}/contact`}
-              className="hidden min-h-11 items-center border border-white/25 px-4 text-[0.7rem] font-semibold tracking-[0.16em] uppercase text-white transition hover:border-white hover:bg-white hover:text-[var(--primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] lg:inline-flex rtl:tracking-normal"
+              className="hidden min-h-11 items-center bg-[var(--accent)] px-5 text-[0.7rem] font-semibold tracking-[0.14em] uppercase text-white shadow-[0_10px_24px_rgba(30,94,255,0.35)] transition hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] lg:inline-flex rtl:tracking-normal"
             >
               {t("contact")}
             </Link>
             <button
               type="button"
-              className="inline-flex h-11 w-11 items-center justify-center border border-white/20 text-white lg:hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+              className="inline-flex h-11 w-11 items-center justify-center border border-white/20 text-white transition hover:border-white/40 hover:bg-white/5 lg:hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
               aria-expanded={open}
               aria-controls="mobile-nav"
               aria-label={open ? common("closeMenu") : common("openMenu")}
@@ -244,7 +244,7 @@ export function SiteHeader({ brand }: { brand: string }) {
               <li className="pt-3">
                 <Link
                   href={`/${locale}/contact`}
-                  className="flex min-h-12 items-center justify-center border border-white/25 px-4 text-sm font-semibold tracking-[0.14em] uppercase text-white"
+                  className="flex min-h-12 items-center justify-center bg-[var(--accent)] px-4 text-sm font-semibold tracking-[0.14em] uppercase text-white"
                   onClick={() => setOpen(false)}
                 >
                   {t("contact")}
@@ -279,29 +279,31 @@ export function SiteFooter({
   ];
 
   return (
-    <footer className="site-footer relative isolate overflow-hidden text-[#e8e4de]">
+    <footer className="site-footer relative isolate overflow-hidden text-[#e8eef6]">
       <div className="site-footer__grid" aria-hidden />
       <div className="site-footer__glow" aria-hidden />
 
-      <div className="container-mt relative z-[1] px-[var(--page-gutter)] pt-[clamp(3.25rem,8vw,5rem)] pb-12">
-        <div className="grid gap-12 lg:grid-cols-12 lg:gap-10">
+      <div className="container-mt relative z-[1] px-[var(--page-gutter)] pt-[clamp(3.75rem,9vw,5.5rem)] pb-14">
+        <div className="grid gap-14 lg:grid-cols-12 lg:gap-12">
           <div className="min-w-0 lg:col-span-5">
-            <p className="font-display text-[0.65rem] tracking-[0.22em] text-[var(--accent)]">MT / FOOTER</p>
-            <Link href={`/${locale}`} className="mt-4 inline-flex" aria-label={brand}>
+            <p className="font-display text-[0.65rem] tracking-[0.22em] text-[var(--accent)]">
+              MASTER TOUCH
+            </p>
+            <Link href={`/${locale}`} className="mt-5 inline-flex" aria-label={brand}>
               <BrandLogo className="h-16 w-[13rem] sm:h-[4.5rem] sm:w-[15rem]" sizes="240px" />
             </Link>
-            <p className="mt-5 max-w-md text-sm leading-relaxed text-white/60">
+            <p className="mt-6 max-w-md text-sm leading-relaxed text-white/65">
               {tagline || t("tagline")}
             </p>
             <div className="mt-8 flex items-center gap-3">
               <span className="h-px w-12 bg-[var(--accent)]" aria-hidden />
-              <span className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-white/40">
-                {locale === "ar" ? "هندسة · تقنية · تنفيذ" : "Engineer · Build · Operate"}
+              <span className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-white/45">
+                {locale === "ar" ? "تشطيب · أنظمة ذكية · تعاقد" : "Fit-out · Smart systems · Contracting"}
               </span>
             </div>
             <Link
               href={`/${locale}/contact`}
-              className="mt-8 inline-flex min-h-11 items-center gap-2 border border-white/20 px-4 text-[0.7rem] font-semibold tracking-[0.16em] uppercase text-white transition hover:border-[var(--accent)] hover:bg-[var(--accent)]"
+              className="mt-9 inline-flex min-h-11 items-center gap-2 bg-[var(--accent)] px-5 text-[0.7rem] font-semibold tracking-[0.14em] uppercase text-white shadow-[0_10px_24px_rgba(30,94,255,0.3)] transition hover:brightness-110"
             >
               {nav("contact")}
               <ArrowUpRight className="h-3.5 w-3.5" aria-hidden />
@@ -353,7 +355,7 @@ export function SiteFooter({
             </div>
 
             <div className="site-footer__col sm:col-span-2 lg:col-span-1">
-              <p className="site-footer__heading">{locale === "ar" ? "المقر" : "Studio"}</p>
+              <p className="site-footer__heading">{locale === "ar" ? "المقر" : "Headquarters"}</p>
               <div className="mt-5 flex gap-3 text-sm leading-relaxed text-white/70">
                 <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[var(--accent)]" aria-hidden />
                 <p>
@@ -362,11 +364,11 @@ export function SiteFooter({
                     : "Riyadh, Kingdom of Saudi Arabia"}
                 </p>
               </div>
-              <div className="mt-6 flex flex-wrap gap-2">
-                {["MEP", "Finishing", "Smart", "O&M"].map((tag) => (
+              <div className="mt-7 flex flex-wrap gap-2">
+                {["Finishing", "Smart", "AV", "Fit-out"].map((tag) => (
                   <span
                     key={tag}
-                    className="border border-white/15 px-2.5 py-1 text-[0.65rem] font-semibold tracking-[0.12em] uppercase text-white/55"
+                    className="border border-white/15 bg-white/[0.03] px-2.5 py-1 text-[0.65rem] font-semibold tracking-[0.12em] uppercase text-white/55"
                   >
                     {tag}
                   </span>
@@ -377,7 +379,7 @@ export function SiteFooter({
         </div>
       </div>
 
-      <div className="relative z-[1] border-t border-white/10">
+      <div className="relative z-[1] border-t border-white/10 bg-black/20">
         <div className="container-mt flex flex-col gap-4 px-[var(--page-gutter)] py-5 pb-[max(1.25rem,env(safe-area-inset-bottom,0px))] sm:flex-row sm:items-center sm:justify-between">
           <p className="text-center text-xs text-white/45 sm:text-start">
             © {year} {brand}. {t("rights")}

@@ -9,13 +9,14 @@ const buttonVariants = cva(
       variant: {
         default:
           "bg-[var(--primary)] text-[var(--primary-foreground)] hover:bg-[color-mix(in_oklab,var(--primary)_88%,white)]",
-        accent: "bg-[var(--accent)] text-white hover:brightness-110",
+        accent:
+          "bg-[var(--accent)] text-white shadow-[0_10px_28px_rgba(30,94,255,0.28)] hover:brightness-110 hover:shadow-[0_14px_36px_rgba(30,94,255,0.34)]",
         outline:
-          "border border-[var(--line)] bg-transparent text-[var(--foreground)] hover:border-[var(--primary)] hover:text-[var(--primary)]",
+          "border border-[var(--line)] bg-transparent text-[var(--foreground)] hover:border-[var(--accent)] hover:text-[var(--accent)]",
         ghost: "text-[var(--foreground)] hover:bg-[var(--muted)]",
         secondary: "bg-[var(--secondary)] text-white hover:opacity-90",
         light:
-          "border border-white/30 bg-white/10 text-white backdrop-blur-sm hover:bg-white hover:text-[var(--primary)]",
+          "border border-white/35 bg-white/10 text-white backdrop-blur-sm hover:border-white hover:bg-white hover:text-[var(--primary)]",
       },
       size: {
         default: "min-h-11 h-11 px-5 sm:px-6",

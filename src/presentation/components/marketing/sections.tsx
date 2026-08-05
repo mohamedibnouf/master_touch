@@ -59,7 +59,7 @@ export function SectionHeading({
 }) {
   return (
     <motion.div
-      className="mb-12 max-w-2xl"
+      className="mb-14 max-w-2xl md:mb-16"
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-80px" }}
@@ -158,7 +158,7 @@ export function HeroSlider({
     HERO_BACKGROUNDS[0];
 
   return (
-    <section className="relative min-h-[100svh] overflow-hidden text-[var(--primary)]">
+    <section className="relative min-h-[100svh] overflow-hidden text-white">
       <AnimatePresence mode="wait">
         <motion.div
           key={media}
@@ -176,15 +176,24 @@ export function HeroSlider({
           />
         </motion.div>
       </AnimatePresence>
-      {/* Soft top veil so fixed white nav stays readable; keep the architecture visible */}
-      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,16,28,0.55)_0%,rgba(6,16,28,0.12)_18%,rgba(255,255,255,0.2)_42%,rgba(247,245,242,0.55)_100%)]" />
+      {/* Premium dark engineering veil — hero-only gradient */}
+      <div className="absolute inset-0 bg-[linear-gradient(115deg,rgba(6,16,28,0.88)_0%,rgba(10,27,51,0.72)_42%,rgba(30,94,255,0.28)_100%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(6,16,28,0.75)_0%,transparent_45%)]" />
 
-      <div className="relative container-mt flex min-h-[100svh] flex-col justify-end px-[var(--page-gutter)] pb-[max(4rem,calc(env(safe-area-inset-bottom,0px)+3rem))] pt-[calc(var(--header-height)+2rem+env(safe-area-inset-top,0px))] md:justify-center md:pb-24">
+      <div className="relative container-mt flex min-h-[100svh] flex-col justify-end px-[var(--page-gutter)] pb-[max(4rem,calc(env(safe-area-inset-bottom,0px)+3rem))] pt-[calc(var(--header-height)+2.5rem+env(safe-area-inset-top,0px))] md:justify-center md:pb-28">
         <motion.p
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.1 }}
-          className="font-display text-display font-semibold leading-[0.95] tracking-tight text-[var(--primary)]"
+          transition={{ duration: 0.7, delay: 0.08 }}
+          className="eyebrow mb-5 text-white"
+        >
+          {locale === "ar" ? "حلول هندسية متكاملة" : "Integrated engineering solutions"}
+        </motion.p>
+        <motion.p
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.14 }}
+          className="font-display text-display font-semibold tracking-tight text-white"
         >
           {section.title}
         </motion.p>
@@ -198,17 +207,22 @@ export function HeroSlider({
             transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
             className="mt-8 max-w-xl"
           >
-            <h1 className="text-xl font-medium text-[var(--primary)] md:text-2xl">
+            <h1 className="text-xl font-medium text-white/95 md:text-2xl">
               {slide?.title ?? section.subtitle}
             </h1>
-            <p className="mt-4 text-base leading-relaxed text-[var(--muted-foreground)] md:text-lg">
+            <p className="mt-4 text-base leading-relaxed text-white/70 md:text-lg">
               {slide?.subtitle ?? section.body}
             </p>
-            <div className="mt-9">
+            <div className="mt-10 flex flex-wrap items-center gap-3">
               <Link href={resolveHref(locale, slide?.link_url ?? section.cta_href)}>
                 <Button variant="accent" size="lg">
                   {slide?.cta_label ?? section.cta_label}
                   <ArrowUpRight className="h-4 w-4" aria-hidden />
+                </Button>
+              </Link>
+              <Link href={`/${locale}/services`}>
+                <Button variant="light" size="lg">
+                  {locale === "ar" ? "استعرض الخدمات" : "Explore services"}
                 </Button>
               </Link>
             </div>
@@ -225,12 +239,12 @@ export function HeroSlider({
                 aria-selected={i === index}
                 aria-label={`Slide ${i + 1}`}
                 onClick={() => setIndex(i)}
-                className="inline-flex min-h-11 min-w-11 items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+                className="inline-flex min-h-11 min-w-11 items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
               >
                 <span
                   className={cn(
                     "h-px transition-all duration-500",
-                    i === index ? "w-12 bg-[var(--accent)]" : "w-6 bg-[var(--primary)]/25",
+                    i === index ? "w-12 bg-[var(--accent)]" : "w-6 bg-white/35",
                   )}
                 />
               </button>
@@ -303,7 +317,7 @@ export function StatsCounter({
     <section className="section-pad border-y border-[var(--line)] bg-[var(--surface)]">
       <div className="container-mt">
         <SectionHeading title={section.title} subtitle={section.subtitle} />
-        <div className="grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-x-10 gap-y-14 sm:grid-cols-2 lg:grid-cols-4">
           {items.map((item, i) => {
             const itemKey =
               "id" in item && typeof item.id === "string" ? item.id : `${item.label}-${i}`;
@@ -314,12 +328,14 @@ export function StatsCounter({
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.08, duration: 0.5 }}
-                className="border-s border-[var(--line)] ps-5 min-w-0"
+                className="min-w-0 border-s-2 border-[var(--accent)]/35 ps-6"
               >
-                <p className="font-display text-[clamp(2.25rem,5vw,3.75rem)] font-semibold tracking-tight text-[var(--primary)]">
+                <p className="font-display text-[clamp(2.5rem,5.5vw,3.85rem)] font-semibold tracking-tight text-[var(--primary)]">
                   <AnimatedStatValue value={item.value} />
                 </p>
-                <p className="mt-3 text-sm leading-relaxed text-[var(--muted-foreground)]">{item.label}</p>
+                <p className="mt-3 text-sm leading-relaxed text-[var(--muted-foreground)] md:text-[0.95rem]">
+                  {item.label}
+                </p>
               </motion.div>
             );
           })}
@@ -508,9 +524,9 @@ export function ServiceCard({
           <span className="service-module__code">{code}</span>
         </div>
 
-        <div className="relative flex flex-col justify-between p-6 md:p-8">
+        <div className="relative flex flex-col justify-between p-7 md:p-9">
           <div>
-            <div className="mb-5 flex items-center justify-between gap-3">
+            <div className="mb-6 flex items-center justify-between gap-3">
               <div className="value-module__icon !my-0 text-[var(--accent)]">
                 <Icon className="h-5 w-5 transition duration-500 group-hover:scale-110" aria-hidden />
               </div>
@@ -518,19 +534,19 @@ export function ServiceCard({
                 {code}
               </span>
             </div>
-            <h3 className="font-display text-2xl font-semibold tracking-tight text-[var(--primary)] transition group-hover:text-[var(--accent)] md:text-[1.65rem]">
+            <h3 className="font-display text-2xl font-semibold tracking-tight text-[var(--primary)] transition group-hover:text-[var(--accent)] md:text-[1.7rem]">
               {service.title}
             </h3>
-            <p className="mt-3 text-sm leading-relaxed text-[var(--muted-foreground)] md:text-[0.95rem]">
+            <p className="mt-4 text-sm leading-relaxed text-[var(--muted-foreground)] md:text-[0.975rem]">
               {service.summary}
             </p>
           </div>
 
-          <div className="mt-8 flex min-w-0 items-center justify-between gap-3 border-t border-[var(--line)] pt-5">
+          <div className="mt-9 flex min-w-0 items-center justify-between gap-3 border-t border-[var(--line)] pt-6">
             <span className="min-w-0 text-[0.65rem] font-semibold tracking-[0.2em] uppercase text-[var(--primary)]/55 transition group-hover:text-[var(--accent)] rtl:tracking-normal">
               {locale === "ar" ? "استكشف الخدمة" : "Explore system"}
             </span>
-            <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center border border-[var(--line)] text-[var(--primary)] transition group-hover:border-[var(--accent)] group-hover:bg-[var(--accent)] group-hover:text-white">
+            <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center border border-[var(--line)] text-[var(--primary)] transition group-hover:border-[var(--accent)] group-hover:bg-[var(--accent)] group-hover:text-white">
               <ArrowUpRight className="h-4 w-4" aria-hidden />
             </span>
           </div>
@@ -626,11 +642,11 @@ export function CtaBanner({ section, locale }: { section: HomepageSection; local
 export function ContactMap({ embedUrl }: { embedUrl: string | null }) {
   if (!embedUrl) return null;
   return (
-    <div className="overflow-hidden border border-[var(--line)]">
+    <div className="overflow-hidden border border-[var(--line)] bg-[var(--surface)] shadow-[var(--shadow-soft)]">
       <iframe
         title="Master Touch map"
         src={embedUrl}
-        className="h-80 w-full"
+        className="h-80 w-full md:h-[22rem]"
         loading="lazy"
         referrerPolicy="no-referrer-when-downgrade"
       />
