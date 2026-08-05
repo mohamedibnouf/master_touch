@@ -52,17 +52,19 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
       />
 
       <section className="section-pad">
-        <div className="container-mt grid items-start gap-12 lg:grid-cols-12">
+        <div className="container-mt grid items-start gap-14 lg:grid-cols-12 lg:gap-16">
           <div className="lg:col-span-7">
             <SectionHeading title={t("aboutStory")} />
-            <p className="text-lg leading-relaxed text-[var(--muted-foreground)]">{about.history}</p>
+            <p className="text-lg leading-relaxed text-[var(--muted-foreground)] md:text-xl md:leading-relaxed">
+              {about.history}
+            </p>
             {about.objectives ? (
-              <p className="mt-8 border-s-2 border-[var(--accent)] ps-5 text-base leading-relaxed text-[var(--foreground)]">
+              <p className="mt-10 border-s-2 border-[var(--accent)] bg-[var(--surface)] p-6 ps-6 text-base leading-relaxed text-[var(--foreground)] shadow-[var(--shadow-soft)] md:p-8">
                 {about.objectives}
               </p>
             ) : null}
           </div>
-          <div className="image-frame relative min-h-[20rem] overflow-hidden rounded-2xl lg:col-span-5 lg:min-h-[28rem]">
+          <div className="image-frame relative min-h-[22rem] overflow-hidden shadow-[var(--shadow-soft)] lg:col-span-5 lg:min-h-[30rem]">
             {/* eslint-disable-next-line @next/next/no-img-element -- local SVG placeholders */}
             <img
               src={
@@ -78,15 +80,15 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
       </section>
 
       <section className="section-pad bg-[var(--muted)]">
-        <div className="container-mt grid gap-px bg-[var(--line)] md:grid-cols-2">
-          <div className="bg-[var(--background)] p-8 md:p-12">
-            <p className="eyebrow mb-4">{t("vision")}</p>
+        <div className="container-mt grid gap-6 md:grid-cols-2">
+          <div className="border border-[var(--line)] bg-[var(--surface)] p-8 shadow-[var(--shadow-soft)] md:p-12">
+            <p className="eyebrow mb-5">{t("vision")}</p>
             <p className="text-lg leading-relaxed text-[var(--muted-foreground)] md:text-xl">
               {about.vision}
             </p>
           </div>
-          <div className="bg-[var(--background)] p-8 md:p-12">
-            <p className="eyebrow mb-4">{t("mission")}</p>
+          <div className="border border-[var(--line)] bg-[var(--surface)] p-8 shadow-[var(--shadow-soft)] md:p-12">
+            <p className="eyebrow mb-5">{t("mission")}</p>
             <p className="text-lg leading-relaxed text-[var(--muted-foreground)] md:text-xl">
               {about.mission}
             </p>
@@ -107,10 +109,10 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
       <section className="section-pad border-y border-[var(--line)] bg-[var(--surface)]">
         <div className="container-mt">
           <SectionHeading title={t("achievements")} />
-          <div className="grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-x-10 gap-y-14 sm:grid-cols-2 lg:grid-cols-4">
             {about.stats.map((s) => (
-              <div key={s.id} className="border-s border-[var(--line)] ps-5">
-                <p className="font-display text-[clamp(2.25rem,5vw,3.5rem)] font-semibold tracking-tight text-[var(--primary)]">
+              <div key={s.id} className="min-w-0 border-s-2 border-[var(--accent)]/35 ps-6">
+                <p className="font-display text-[clamp(2.5rem,5.5vw,3.75rem)] font-semibold tracking-tight text-[var(--primary)]">
                   {s.value}
                 </p>
                 <p className="mt-3 text-sm leading-relaxed text-[var(--muted-foreground)]">{s.label}</p>
@@ -124,7 +126,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
         <div className="container-mt">
           <div className="max-w-3xl">
           <SectionHeading title={t("ceoMessage")} />
-          <blockquote className="border border-[var(--line)] bg-[var(--surface)] p-8 md:p-12">
+          <blockquote className="border border-[var(--line)] bg-[var(--surface)] p-8 shadow-[var(--shadow-soft)] md:p-12">
             <p className="font-display text-[clamp(1.35rem,3vw,1.85rem)] leading-relaxed text-[var(--primary)]">
               “{about.ceo_message}”
             </p>

@@ -834,13 +834,15 @@ export function Timeline({
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.08, duration: 0.45 }}
-              className="grid gap-4 border-t border-[var(--line)] py-10 md:grid-cols-12 md:gap-8"
+              className="grid gap-4 border-t border-[var(--line)] py-10 md:grid-cols-12 md:gap-10 md:py-12"
             >
-              <p className="font-display text-3xl font-semibold text-[var(--accent)] md:col-span-2">
+              <p className="font-display text-3xl font-semibold tracking-tight text-[var(--accent)] md:col-span-2">
                 {item.event_year}
               </p>
               <div className="md:col-span-10">
-                <h3 className="text-xl font-semibold text-[var(--primary)]">{item.title}</h3>
+                <h3 className="font-display text-xl font-semibold tracking-tight text-[var(--primary)] md:text-[1.35rem]">
+                  {item.title}
+                </h3>
                 {item.description ? (
                   <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[var(--muted-foreground)] md:text-base">
                     {item.description}
