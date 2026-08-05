@@ -39,6 +39,21 @@ export const themeUpdateSchema = z.object({
   font_display: z.string().min(1).max(64),
 });
 
+export const siteSettingsUpdateSchema = z.object({
+  site_name_en: z.string().trim().max(120).optional(),
+  site_name_ar: z.string().trim().max(120).optional(),
+  website_url: z.string().trim().url().max(500).optional().or(z.literal("")),
+  default_locale: z.enum(["ar", "en"]).optional(),
+  social_links: z.record(z.string(), z.string()).optional(),
+});
+
+export const serviceSlugSchema = z
+  .string()
+  .trim()
+  .min(1)
+  .max(80)
+  .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
+
 export function sanitizePlainText(value: string): string {
   return value
     .replace(/[<>]/g, "")

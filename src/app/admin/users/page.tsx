@@ -1,39 +1,39 @@
-"use client";
-
-import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 import { Card, Badge } from "@/presentation/components/ui/primitives";
 import { Button } from "@/presentation/components/ui/button";
 import { EmptyState } from "@/presentation/components/admin/AsyncStates";
+import { listAdminUsersAction } from "@/actions/admin-directory";
 
-const demoUsers = [
-  { name: "Super Admin", email: "admin@mastertouchksa.com", role: "super_admin", active: true },
-  { name: "Content Manager", email: "content@mastertouchksa.com", role: "content_manager", active: true },
-  { name: "Editor", email: "editor@mastertouchksa.com", role: "editor", active: true },
-];
-
-export default function AdminUsersPage() {
-  const t = useTranslations("admin");
+export default async function AdminUsersPage() {
+  const t = await getTranslations("admin");
+  const result = await listAdminUsersAction();
+  const users = result.data;
 
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-display text-3xl text-[var(--primary)]">{t("users")}</h1>
-        <Button variant="accent">{t("inviteUser")}</Button>
+        <Button variant="accent" type="button" disabled title="Invite flow is not enabled in this release">
+          {t("inviteUser")}
+        </Button>
       </div>
-      {!demoUsers.length ? <EmptyState title={t("noUsers")} /> : null}
+      {!users.length ? <EmptyState title={t("noUsers")} /> : null}
       <div className="space-y-3">
-        {demoUsers.map((u) => (
-          <Card key={u.email} className="flex flex-wrap items-center justify-between gap-3">
+        {users.map((u) => (
+          <Card key={u.id} className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <p className="font-semibold text-[var(--primary)]">{u.name}</p>
+              <p className="font-semibold text-[var(--primary)]">{u.full_name || u.email}</p>
               <p className="text-sm text-[var(--muted-foreground)]">{u.email}</p>
             </div>
-            <div className="flex items-center gap-2">
-              <Badge>{u.role}</Badge>
-              {u.active ? <Badge className="bg-emerald-50 text-emerald-700">{t("active")}</Badge> : null}
-              <Button variant="outline" size="sm">
-                {t("edit")}
-              </Button>
+            <div className="flex flex-wrap items-center gap-2">
+              {(u.roles.length ? u.roles : ["unassigned"]).map((role) => (
+                <Badge key={role}>{role}</Badge>
+              ))}
+              {u.is_active ? (
+                <Badge className="bg-emerald-50 text-emerald-700">{t("active")}</Badge>
+              ) : (
+                <Badge className="bg-[var(--muted)] text-[var(--muted-foreground)]">inactive</Badge>
+              )}
             </div>
           </Card>
         ))}

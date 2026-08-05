@@ -12,6 +12,7 @@ import { createPublicClient } from "@/infrastructure/supabase/public";
 import { isSupabaseConfigured } from "@/infrastructure/supabase/config";
 import { DatabaseError, NotFoundError } from "@/domain/shared/errors";
 import { unstable_cache } from "next/cache";
+import { logger } from "@/infrastructure/logging/logger";
 import {
   previewAboutContent,
   previewContactContent,
@@ -309,8 +310,185 @@ export async function getServiceBySlug(
   slug: string,
   locale: AppLocale,
 ): Promise<ServiceItem | null> {
-  const services = await getServices(locale);
-  return services.find((s) => s.slug === slug) ?? null;
+  if (!isSupabaseConfigured()) {
+    return previewServices(locale).find((s) => s.slug === slug) ?? null;
+  }
+  try {
+    const supabase = sb();
+    const { data, error } = await supabase
+      .from("services")
+      .select("*, service_translations(*)")
+      .eq("slug", slug)
+      .is("deleted_at", null)
+      .eq("is_published", true)
+      .maybeSingle();
+    if (error) throw new DatabaseError(error.message, error);
+    if (!data) return null;
+    return mapServiceRow(data as Record<string, unknown>, locale);
+  } catch (error) {
+    logger.warn("getServiceBySlug.fallback", {
+      slug,
+      message: error instanceof Error ? error.message : String(error),
+    });
+    return previewServices(locale).find((s) => s.slug === slug) ?? null;
+  }
+}
+
+export type AdminServiceFormRow = ServiceItem & {
+  translations: {
+    ar: {
+      title: string;
+      summary: string | null;
+      description: string | null;
+      seo_title: string | null;
+      seo_description: string | null;
+    } | null;
+    en: {
+      title: string;
+      summary: string | null;
+      description: string | null;
+      seo_title: string | null;
+      seo_description: string | null;
+    } | null;
+  };
+};
+
+/** Single query for admin services forms (both locales). */
+export async function getAdminServicesDetailed(): Promise<AdminServiceFormRow[]> {
+  if (!isSupabaseConfigured()) {
+    return previewServices("en").map((s) => ({
+      ...s,
+      translations: {
+        en: {
+          title: s.title,
+          summary: s.summary,
+          description: s.description,
+          seo_title: s.seo_title,
+          seo_description: s.seo_description,
+        },
+        ar: null,
+      },
+    }));
+  }
+  try {
+    const { createAdminClient } = await import("@/infrastructure/supabase/admin");
+    const admin = createAdminClient();
+    const { data, error } = await admin
+      .from("services")
+      .select("*, service_translations(*)")
+      .is("deleted_at", null)
+      .order("sort_order", { ascending: true });
+    if (error) throw new DatabaseError(error.message, error);
+
+    return (data ?? []).map((row) => {
+      const translations = (row.service_translations as Array<Record<string, unknown>>) ?? [];
+      const pick = (locale: AppLocale) => {
+        const tr = translations.find((t) => t.locale === locale);
+        if (!tr) return null;
+        return {
+          title: String(tr.title ?? ""),
+          summary: (tr.summary as string | null) ?? null,
+          description: (tr.description as string | null) ?? null,
+          seo_title: (tr.seo_title as string | null) ?? null,
+          seo_description: (tr.seo_description as string | null) ?? null,
+        };
+      };
+      return {
+        ...mapServiceRow(row as Record<string, unknown>, "en"),
+        translations: { ar: pick("ar"), en: pick("en") },
+      };
+    });
+  } catch (error) {
+    logger.warn("getAdminServicesDetailed.fallback", {
+      message: error instanceof Error ? error.message : String(error),
+    });
+    return previewServices("en").map((s) => ({
+      ...s,
+      translations: {
+        en: {
+          title: s.title,
+          summary: s.summary,
+          description: s.description,
+          seo_title: s.seo_title,
+          seo_description: s.seo_description,
+        },
+        ar: null,
+      },
+    }));
+  }
+}
+
+export async function getHomepageSectionsPair(): Promise<{
+  ar: HomepageSection[];
+  en: HomepageSection[];
+}> {
+  if (!isSupabaseConfigured()) {
+    return { ar: previewHomepageSections("ar"), en: previewHomepageSections("en") };
+  }
+  try {
+    const supabase = sb();
+    const { data: sections, error } = await supabase
+      .from("homepage_sections")
+      .select("*, homepage_section_translations(*), homepage_slides(*, homepage_slide_translations(*))")
+      .is("deleted_at", null)
+      .order("sort_order", { ascending: true });
+    if (error) throw new DatabaseError(error.message, error);
+    if (!sections?.length) return { ar: [], en: [] };
+    return {
+      ar: sections.map((section) => mapHomepageSection(section, "ar")),
+      en: sections.map((section) => mapHomepageSection(section, "en")),
+    };
+  } catch (error) {
+    logger.warn("getHomepageSectionsPair.fallback", {
+      message: error instanceof Error ? error.message : String(error),
+    });
+    return { ar: previewHomepageSections("ar"), en: previewHomepageSections("en") };
+  }
+}
+
+function mapHomepageSection(section: Record<string, unknown>, locale: AppLocale): HomepageSection {
+  const translations =
+    (section.homepage_section_translations as Array<{ locale: string; title?: string | null; subtitle?: string | null; body?: string | null; cta_label?: string | null; cta_href?: string | null }>) ??
+    [];
+  const tr = translations.find((t) => t.locale === locale) ?? translations[0];
+
+  const slides = ((section.homepage_slides as Array<Record<string, unknown>>) ?? [])
+    .filter((s) => !s.deleted_at && s.is_enabled)
+    .sort((a, b) => Number(a.sort_order ?? 0) - Number(b.sort_order ?? 0))
+    .map((slide) => {
+      const slideTrs =
+        (slide.homepage_slide_translations as Array<{
+          locale: string;
+          title: string | null;
+          subtitle: string | null;
+          cta_label: string | null;
+        }>) ?? [];
+      const st = slideTrs.find((t) => t.locale === locale) ?? slideTrs[0];
+      return {
+        id: String(slide.id),
+        media_url: (slide.media_url as string | null) ?? null,
+        sort_order: Number(slide.sort_order ?? 0),
+        is_enabled: Boolean(slide.is_enabled),
+        link_url: (slide.link_url as string | null) ?? null,
+        title: st?.title ?? null,
+        subtitle: st?.subtitle ?? null,
+        cta_label: st?.cta_label ?? null,
+      };
+    });
+
+  return {
+    id: String(section.id),
+    key: String(section.key),
+    sort_order: Number(section.sort_order ?? 0),
+    is_enabled: Boolean(section.is_enabled),
+    settings: (section.settings as HomepageSection["settings"]) ?? {},
+    title: tr?.title ?? null,
+    subtitle: tr?.subtitle ?? null,
+    body: tr?.body ?? null,
+    cta_label: tr?.cta_label ?? null,
+    cta_href: tr?.cta_href ?? null,
+    slides,
+  };
 }
 
 export async function getContactContent(locale: AppLocale): Promise<ContactContent> {

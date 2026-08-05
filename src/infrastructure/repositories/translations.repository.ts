@@ -92,7 +92,8 @@ export async function listTranslationRows() {
   const { data, error } = await admin
     .from("translations")
     .select("id, key, locale, value, namespace_id, translation_namespaces(slug)")
-    .order("key");
+    .order("key")
+    .limit(5000);
   if (error) throw new DatabaseError(error.message, error);
   return data ?? [];
 }

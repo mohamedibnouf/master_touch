@@ -1,24 +1,14 @@
-"use client";
-
-import dynamic from "next/dynamic";
-import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 import { Card } from "@/presentation/components/ui/primitives";
 import Link from "next/link";
 import { Button } from "@/presentation/components/ui/button";
-import { LoadingState } from "@/presentation/components/admin/AsyncStates";
+import { getDashboardStatsAction } from "@/actions/admin-directory";
+import { DashboardChartsSlot } from "@/presentation/features/admin/DashboardChartsSlot";
 
-const DashboardCharts = dynamic(() => import("@/presentation/features/admin/DashboardCharts"), {
-  ssr: false,
-  loading: () => (
-    <div className="grid gap-4 lg:grid-cols-2">
-      <LoadingState label="…" />
-      <LoadingState label="…" />
-    </div>
-  ),
-});
-
-export default function AdminDashboardPage() {
-  const t = useTranslations("admin");
+export default async function AdminDashboardPage() {
+  const t = await getTranslations("admin");
+  const stats = await getDashboardStatsAction();
+  const data = stats.data;
 
   return (
     <div className="space-y-6">
@@ -29,10 +19,13 @@ export default function AdminDashboardPage() {
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {[
-          { label: t("visitors"), value: "12.4k" },
-          { label: t("projects"), value: "48" },
-          { label: t("messages"), value: "28" },
-          { label: t("applications"), value: "6" },
+          { label: t("services"), value: String(data.services) },
+          { label: t("messages"), value: String(data.messages) },
+          { label: t("media"), value: String(data.media) },
+          {
+            label: t("latestActivity"),
+            value: String(Array.isArray(data.recent) ? data.recent.length : 0),
+          },
         ].map((item) => (
           <Card key={item.label}>
             <p className="text-xs uppercase tracking-wide text-[var(--muted-foreground)]">{item.label}</p>
@@ -41,7 +34,7 @@ export default function AdminDashboardPage() {
         ))}
       </div>
 
-      <DashboardCharts />
+      <DashboardChartsSlot />
 
       <Card>
         <p className="mb-4 font-semibold text-[var(--primary)]">{t("quickActions")}</p>
@@ -64,7 +57,19 @@ export default function AdminDashboardPage() {
       <Card>
         <p className="mb-2 font-semibold text-[var(--primary)]">{t("systemHealth")}</p>
         <p className="text-sm text-emerald-700">{t("operational")}</p>
-        <p className="mt-2 text-sm text-[var(--muted-foreground)]">{t("latestActivity")}</p>
+        <ul className="mt-3 space-y-1 text-sm text-[var(--muted-foreground)]">
+          {Array.isArray(data.recent) && data.recent.length ? (
+            data.recent.map((row) => (
+              <li key={row.id}>
+                <span className="font-mono text-xs">{row.action}</span>
+                <span className="mx-2">·</span>
+                <span>{row.entity_type}</span>
+              </li>
+            ))
+          ) : (
+            <li>{t("latestActivity")}</li>
+          )}
+        </ul>
       </Card>
     </div>
   );

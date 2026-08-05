@@ -2,7 +2,7 @@
 
 import { revalidatePath, revalidateTag } from "next/cache";
 import { createAdminClient } from "@/infrastructure/supabase/admin";
-import { themeUpdateSchema } from "@/lib/validations";
+import { themeUpdateSchema, siteSettingsUpdateSchema, serviceSlugSchema } from "@/lib/validations";
 import { requirePermission, writeAuditLog } from "@/lib/permissions";
 import { toActionError, ValidationError, DatabaseError } from "@/domain/shared/errors";
 import { upsertTranslation } from "@/infrastructure/repositories/translations.repository";
@@ -22,6 +22,8 @@ export async function updateThemeAction(payload: Record<string, string>) {
     await writeAuditLog("theme.update", "theme_settings");
     revalidateTag("theme", "max");
     revalidatePath("/");
+    revalidatePath("/ar");
+    revalidatePath("/en");
     revalidatePath("/admin/theme");
     return { ok: true as const };
   } catch (error) {
@@ -38,6 +40,9 @@ export async function updateSiteSettingsAction(payload: {
 }) {
   try {
     await requirePermission("settings.manage");
+    const parsed = siteSettingsUpdateSchema.safeParse(payload);
+    if (!parsed.success) throw new ValidationError("Invalid site settings", parsed.error.flatten());
+
     const admin = createAdminClient();
     const { data: current, error: readError } = await admin
       .from("site_settings")
@@ -52,12 +57,12 @@ export async function updateSiteSettingsAction(payload: {
       .update({
         site_name_i18n: {
           ...(current.site_name_i18n as Record<string, string>),
-          ...(payload.site_name_en ? { en: payload.site_name_en } : {}),
-          ...(payload.site_name_ar ? { ar: payload.site_name_ar } : {}),
+          ...(parsed.data.site_name_en ? { en: parsed.data.site_name_en } : {}),
+          ...(parsed.data.site_name_ar ? { ar: parsed.data.site_name_ar } : {}),
         },
-        website_url: payload.website_url ?? current.website_url,
-        default_locale: payload.default_locale ?? current.default_locale,
-        social_links: payload.social_links ?? current.social_links,
+        website_url: parsed.data.website_url || current.website_url,
+        default_locale: parsed.data.default_locale ?? current.default_locale,
+        social_links: parsed.data.social_links ?? current.social_links,
       })
       .eq("id", current.id);
 
@@ -207,13 +212,26 @@ export async function updateContactSettingsAction(formData: FormData) {
     await requirePermission("contact.update");
     const settingsId = String(formData.get("settings_id") ?? "");
     if (!settingsId) throw new ValidationError("settings_id required");
+    const idOk = z.string().uuid().safeParse(settingsId);
+    if (!idOk.success) throw new ValidationError("Invalid settings_id");
+
+    const notifyRaw = String(formData.get("notify_email") ?? "").trim();
+    if (notifyRaw) {
+      const emailOk = z.string().email().safeParse(notifyRaw);
+      if (!emailOk.success) throw new ValidationError("Invalid notify_email");
+    }
+    const mapRaw = String(formData.get("map_embed_url") ?? "").trim();
+    if (mapRaw) {
+      const urlOk = z.string().url().safeParse(mapRaw);
+      if (!urlOk.success) throw new ValidationError("Invalid map_embed_url");
+    }
 
     const admin = createAdminClient();
     const { error: settingsError } = await admin
       .from("contact_settings")
       .update({
-        notify_email: String(formData.get("notify_email") ?? "") || null,
-        map_embed_url: String(formData.get("map_embed_url") ?? "") || null,
+        notify_email: notifyRaw || null,
+        map_embed_url: mapRaw || null,
         is_form_enabled: formData.get("is_form_enabled") === "on" || formData.get("is_form_enabled") === "true",
       })
       .eq("id", settingsId);
@@ -235,6 +253,8 @@ export async function updateContactSettingsAction(formData: FormData) {
 
     await writeAuditLog("contact.update", "contact_settings", settingsId);
     revalidatePath("/contact");
+    revalidatePath("/ar/contact");
+    revalidatePath("/en/contact");
     revalidatePath("/admin/contact");
     return { ok: true as const };
   } catch (error) {
@@ -262,10 +282,16 @@ export async function listContactMessagesAction() {
 export async function updateContactMessageStatusAction(id: string, status: string) {
   try {
     await requirePermission("contact_messages.update");
+    const idOk = z.string().uuid().safeParse(id);
+    if (!idOk.success) throw new ValidationError("Invalid id");
     const parsed = z.enum(["new", "read", "replied", "archived"]).safeParse(status);
     if (!parsed.success) throw new ValidationError("Invalid status");
     const admin = createAdminClient();
-    const { error } = await admin.from("contact_messages").update({ status: parsed.data }).eq("id", id);
+    const { error } = await admin
+      .from("contact_messages")
+      .update({ status: parsed.data })
+      .eq("id", id)
+      .is("deleted_at", null);
     if (error) throw new DatabaseError(error.message, error);
     await writeAuditLog("contact_messages.update", "contact_messages", id, { status: parsed.data });
     revalidatePath("/admin/contact");
@@ -278,17 +304,33 @@ export async function updateContactMessageStatusAction(id: string, status: strin
 export async function createServiceAction(formData: FormData) {
   try {
     await requirePermission("services.create");
-    const slug = String(formData.get("slug") ?? "")
+    const slugRaw = String(formData.get("slug") ?? "")
       .trim()
       .toLowerCase()
-      .replace(/[^a-z0-9-]+/g, "-");
-    if (!slug) throw new ValidationError("slug required");
+      .replace(/[^a-z0-9-]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+    const slugParsed = serviceSlugSchema.safeParse(slugRaw);
+    if (!slugParsed.success) throw new ValidationError("Invalid slug");
+
+    const titles = {
+      ar: String(formData.get("title_ar") ?? "").trim(),
+      en: String(formData.get("title_en") ?? "").trim(),
+    };
+    if (!titles.ar || !titles.en) throw new ValidationError("title_ar and title_en required");
 
     const admin = createAdminClient();
+    const { data: existing } = await admin
+      .from("services")
+      .select("id")
+      .eq("slug", slugParsed.data)
+      .is("deleted_at", null)
+      .maybeSingle();
+    if (existing) throw new ValidationError("Slug already exists");
+
     const { data, error } = await admin
       .from("services")
       .insert({
-        slug,
+        slug: slugParsed.data,
         icon: String(formData.get("icon") ?? "") || null,
         cover_image_url: String(formData.get("cover_image_url") ?? "") || null,
         is_featured: formData.get("is_featured") === "on",
@@ -300,26 +342,34 @@ export async function createServiceAction(formData: FormData) {
       .single();
     if (error) throw new DatabaseError(error.message, error);
 
-    for (const locale of ["ar", "en"] as const) {
-      const title = String(formData.get(`title_${locale}`) ?? "").trim();
-      if (!title) throw new ValidationError(`title_${locale} required`);
-      const { error: trError } = await admin.from("service_translations").upsert(
-        {
-          service_id: data.id,
-          locale,
-          title,
-          summary: String(formData.get(`summary_${locale}`) ?? "") || null,
-          description: String(formData.get(`description_${locale}`) ?? "") || null,
-          seo_title: String(formData.get(`seo_title_${locale}`) ?? "") || null,
-          seo_description: String(formData.get(`seo_description_${locale}`) ?? "") || null,
-        },
-        { onConflict: "service_id,locale" },
-      );
-      if (trError) throw new DatabaseError(trError.message, trError);
+    try {
+      for (const locale of ["ar", "en"] as const) {
+        const { error: trError } = await admin.from("service_translations").upsert(
+          {
+            service_id: data.id,
+            locale,
+            title: titles[locale],
+            summary: String(formData.get(`summary_${locale}`) ?? "") || null,
+            description: String(formData.get(`description_${locale}`) ?? "") || null,
+            seo_title: String(formData.get(`seo_title_${locale}`) ?? "") || null,
+            seo_description: String(formData.get(`seo_description_${locale}`) ?? "") || null,
+          },
+          { onConflict: "service_id,locale" },
+        );
+        if (trError) throw new DatabaseError(trError.message, trError);
+      }
+    } catch (trFailure) {
+      await admin
+        .from("services")
+        .update({ deleted_at: new Date().toISOString(), is_published: false })
+        .eq("id", data.id);
+      throw trFailure;
     }
 
     await writeAuditLog("services.create", "services", data.id);
     revalidatePath("/services");
+    revalidatePath("/ar/services");
+    revalidatePath("/en/services");
     revalidatePath("/admin/services");
     return { ok: true as const, id: data.id };
   } catch (error) {
@@ -332,13 +382,38 @@ export async function updateServiceAction(formData: FormData) {
     await requirePermission("services.update");
     const id = String(formData.get("id") ?? "");
     if (!id) throw new ValidationError("id required");
+    const idOk = z.string().uuid().safeParse(id);
+    if (!idOk.success) throw new ValidationError("Invalid id");
+
+    const slugRaw = String(formData.get("slug") ?? "")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9-]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+    const slugParsed = serviceSlugSchema.safeParse(slugRaw);
+    if (!slugParsed.success) throw new ValidationError("Invalid slug");
+
+    const titles = {
+      ar: String(formData.get("title_ar") ?? "").trim(),
+      en: String(formData.get("title_en") ?? "").trim(),
+    };
+    if (!titles.ar || !titles.en) throw new ValidationError("title_ar and title_en required");
 
     const admin = createAdminClient();
+    const { data: conflict } = await admin
+      .from("services")
+      .select("id")
+      .eq("slug", slugParsed.data)
+      .neq("id", id)
+      .is("deleted_at", null)
+      .maybeSingle();
+    if (conflict) throw new ValidationError("Slug already exists");
+
     const published = formData.get("is_published") !== "off";
     const { error } = await admin
       .from("services")
       .update({
-        slug: String(formData.get("slug") ?? "").trim() || undefined,
+        slug: slugParsed.data,
         icon: String(formData.get("icon") ?? "") || null,
         cover_image_url: String(formData.get("cover_image_url") ?? "") || null,
         is_featured: formData.get("is_featured") === "on",
@@ -346,7 +421,8 @@ export async function updateServiceAction(formData: FormData) {
         sort_order: Number(formData.get("sort_order") ?? 0) || 0,
         status: published ? "published" : "draft",
       })
-      .eq("id", id);
+      .eq("id", id)
+      .is("deleted_at", null);
     if (error) throw new DatabaseError(error.message, error);
 
     for (const locale of ["ar", "en"] as const) {
@@ -354,7 +430,7 @@ export async function updateServiceAction(formData: FormData) {
         {
           service_id: id,
           locale,
-          title: String(formData.get(`title_${locale}`) ?? "").trim() || "Untitled",
+          title: titles[locale],
           summary: String(formData.get(`summary_${locale}`) ?? "") || null,
           description: String(formData.get(`description_${locale}`) ?? "") || null,
           seo_title: String(formData.get(`seo_title_${locale}`) ?? "") || null,
@@ -367,6 +443,8 @@ export async function updateServiceAction(formData: FormData) {
 
     await writeAuditLog("services.update", "services", id);
     revalidatePath("/services");
+    revalidatePath("/ar/services");
+    revalidatePath("/en/services");
     revalidatePath("/admin/services");
     return { ok: true as const };
   } catch (error) {
@@ -377,14 +455,19 @@ export async function updateServiceAction(formData: FormData) {
 export async function deleteServiceAction(id: string) {
   try {
     await requirePermission("services.delete");
+    const idOk = z.string().uuid().safeParse(id);
+    if (!idOk.success) throw new ValidationError("Invalid id");
     const admin = createAdminClient();
     const { error } = await admin
       .from("services")
       .update({ deleted_at: new Date().toISOString(), is_published: false })
-      .eq("id", id);
+      .eq("id", id)
+      .is("deleted_at", null);
     if (error) throw new DatabaseError(error.message, error);
     await writeAuditLog("services.delete", "services", id);
     revalidatePath("/services");
+    revalidatePath("/ar/services");
+    revalidatePath("/en/services");
     revalidatePath("/admin/services");
     return { ok: true as const };
   } catch (error) {
