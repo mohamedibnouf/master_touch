@@ -423,7 +423,7 @@ export function ValuesShowcase({
           </motion.div>
         </div>
 
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((item, i) => {
             const Icon = iconMap[item.icon] ?? Sparkles;
             const index = String(i + 1).padStart(2, "0");
@@ -516,10 +516,11 @@ export function ServiceCard({
               className="object-cover transition duration-700 group-hover:scale-[1.04]"
             />
           ) : (
-            <div className="flex h-full min-h-52 items-center justify-center bg-[linear-gradient(145deg,#06101c,#14304f)]">
+            <div className="flex h-full min-h-52 items-center justify-center bg-[linear-gradient(145deg,#06101c,#132a4a)]">
               <Icon className="h-12 w-12 text-[var(--accent)]" />
             </div>
           )}
+          <div className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-t from-[rgba(6,16,28,0.55)] via-transparent to-transparent opacity-80 transition duration-500 group-hover:opacity-95" />
           <div className="service-module__grid" aria-hidden />
           <span className="service-module__code">{code}</span>
         </div>
@@ -583,9 +584,9 @@ export function CtaBanner({ section, locale }: { section: HomepageSection; local
         <div className="cta-engineering__beam" aria-hidden />
         <div className="cta-engineering__frame" aria-hidden />
 
-        <div className="relative z-[3] grid gap-10 px-[clamp(1.25rem,4vw,3.5rem)] py-[clamp(2.75rem,7vw,5rem)] lg:grid-cols-12 lg:items-end">
+        <div className="relative z-[3] grid gap-10 px-[clamp(1.5rem,4.5vw,3.75rem)] py-[clamp(3rem,7.5vw,5.5rem)] lg:grid-cols-12 lg:items-end">
           <div className="min-w-0 lg:col-span-8">
-            <div className="mb-6 flex flex-wrap items-center gap-3">
+            <div className="mb-7 flex flex-wrap items-center gap-3">
               <p className="eyebrow mb-0 text-[var(--accent)]">
                 {locale === "ar" ? "ابدأ معنا" : "Engage"}
               </p>
@@ -599,13 +600,13 @@ export function CtaBanner({ section, locale }: { section: HomepageSection; local
               {section.title}
             </h2>
             {section.subtitle ? (
-              <p className="mt-5 max-w-xl text-base leading-relaxed text-white/70 md:text-lg">
+              <p className="mt-6 max-w-xl text-base leading-relaxed text-white/70 md:text-lg">
                 {section.subtitle}
               </p>
             ) : null}
 
             {section.cta_href ? (
-              <div className="mt-9 flex flex-wrap items-center gap-4">
+              <div className="mt-10 flex flex-wrap items-center gap-4">
                 <Link href={resolveHref(locale, section.cta_href)}>
                   <Button variant="accent" size="lg" className="min-w-[10.5rem]">
                     {section.cta_label}
@@ -620,14 +621,14 @@ export function CtaBanner({ section, locale }: { section: HomepageSection; local
           </div>
 
           <div className="hidden min-w-0 lg:col-span-4 lg:block">
-            <div className="ms-auto max-w-[14rem] border border-white/15 bg-white/[0.03] p-5 backdrop-blur-[2px]">
+            <div className="ms-auto max-w-[15rem] border border-white/15 bg-white/[0.04] p-6 backdrop-blur-[2px]">
               <p className="font-display text-[0.65rem] tracking-[0.2em] text-[var(--accent)]">SPEC</p>
-              <p className="mt-3 text-sm leading-relaxed text-white/70">
+              <p className="mt-4 text-sm leading-relaxed text-white/70">
                 {locale === "ar"
                   ? "دقة التنفيذ · جودة المواد · التزام بالمواعيد"
                   : "Execution precision · Material quality · On-time delivery"}
               </p>
-              <div className="mt-5 flex items-center gap-2">
+              <div className="mt-6 flex items-center gap-2">
                 <span className="h-px flex-1 bg-white/15" aria-hidden />
                 <span className="font-display text-[0.65rem] tracking-[0.16em] text-white/40">MT</span>
               </div>
@@ -683,7 +684,7 @@ export function VisionMissionPair({
 }) {
   return (
     <section className="section-pad bg-[var(--muted)]">
-      <div className="container-mt grid gap-px bg-[var(--line)] md:grid-cols-2">
+      <div className="container-mt grid gap-6 md:grid-cols-2">
         {[vision, mission].map((block, i) => (
           <motion.div
             key={block.id}
@@ -691,9 +692,9 @@ export function VisionMissionPair({
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: i * 0.1, duration: 0.5 }}
-            className="bg-[var(--background)] p-8 md:p-12"
+            className="border border-[var(--line)] bg-[var(--surface)] p-8 shadow-[var(--shadow-soft)] md:p-12"
           >
-            <p className="eyebrow mb-4">{block.title}</p>
+            <p className="eyebrow mb-5">{block.title}</p>
             <p className="text-lg leading-relaxed text-[var(--muted-foreground)] md:text-xl">
               {block.body}
             </p>
@@ -715,19 +716,21 @@ export function AboutIntro({
 }) {
   return (
     <section className="section-pad">
-      <div className="container-mt grid items-center gap-12 lg:grid-cols-12">
+      <div className="container-mt grid items-center gap-14 lg:grid-cols-12 lg:gap-16">
         <motion.div
           className="lg:col-span-6"
-          initial={{ opacity: 0, x: -20 }}
-          whileInView={{ opacity: 1, x: 0 }}
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.55 }}
         >
           <SectionHeading title={section.title} subtitle={section.subtitle} />
-          <p className="text-lg leading-relaxed text-[var(--muted-foreground)]">{section.body}</p>
+          <p className="text-lg leading-relaxed text-[var(--muted-foreground)] md:text-xl">
+            {section.body}
+          </p>
           {section.cta_href ? (
-            <Link href={resolveHref(locale, section.cta_href)} className="mt-8 inline-block">
-              <Button variant="outline">
+            <Link href={resolveHref(locale, section.cta_href)} className="mt-10 inline-block">
+              <Button variant="outline" size="lg">
                 {section.cta_label}
                 <ArrowUpRight className="h-4 w-4" aria-hidden />
               </Button>
@@ -735,9 +738,9 @@ export function AboutIntro({
           ) : null}
         </motion.div>
         <motion.div
-          className="image-frame relative min-h-[22rem] overflow-hidden rounded-2xl lg:col-span-6"
-          initial={{ opacity: 0, x: 20 }}
-          whileInView={{ opacity: 1, x: 0 }}
+          className="image-frame relative min-h-[24rem] overflow-hidden shadow-[var(--shadow-soft)] lg:col-span-6 lg:min-h-[32rem]"
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.55, delay: 0.1 }}
         >
@@ -763,7 +766,7 @@ export function ServicesShowcase({
   return (
     <section className="services-engineering section-pad">
       <div className="container-mt">
-        <div className="mb-14 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+        <div className="mb-16 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
           <motion.div
             className="max-w-2xl"
             initial={{ opacity: 0, y: 20 }}
@@ -796,7 +799,7 @@ export function ServicesShowcase({
           </div>
         </div>
 
-        <div className="grid gap-5 md:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-2">
           {services.map((service, i) => (
             <ServiceCard
               key={service.id}
