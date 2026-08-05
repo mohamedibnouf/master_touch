@@ -38,19 +38,24 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
         imageSrc="/images/placeholders/hero-3.svg"
       />
       <section className="section-pad">
-        <div className="container-mt grid gap-12 lg:grid-cols-12">
-          <div className="space-y-8 lg:col-span-5">
+        <div className="container-mt grid gap-14 lg:grid-cols-12 lg:gap-16">
+          <div className="space-y-10 lg:col-span-5">
             {contact.branches.map((b) => (
-              <div key={b.id} className="border-s border-[var(--accent)] ps-5">
-                <h2 className="text-xl font-semibold text-[var(--primary)]">{b.name}</h2>
-                <p className="mt-2 text-sm leading-relaxed text-[var(--muted-foreground)]">
+              <div
+                key={b.id}
+                className="border border-[var(--line)] bg-[var(--surface)] p-6 shadow-[var(--shadow-soft)] md:p-7"
+              >
+                <h2 className="font-display text-xl font-semibold tracking-tight text-[var(--primary)]">
+                  {b.name}
+                </h2>
+                <p className="mt-3 text-sm leading-relaxed text-[var(--muted-foreground)]">
                   {[b.address, b.city, b.country].filter(Boolean).join(" · ")}
                 </p>
               </div>
             ))}
-            <div className="space-y-3 border-t border-[var(--line)] pt-8">
+            <div className="space-y-1 border border-[var(--line)] bg-[var(--surface)] p-6 shadow-[var(--shadow-soft)] md:p-7">
               {contact.channels.map((c) => (
-                <div key={c.id} className="flex items-start gap-3 py-2">
+                <div key={c.id} className="flex items-start gap-3 border-b border-[var(--line)] py-3.5 last:border-b-0">
                   {c.channel_type === "email" ? (
                     <Mail className="mt-0.5 h-4 w-4 text-[var(--accent)]" aria-hidden />
                   ) : null}

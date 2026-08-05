@@ -44,7 +44,7 @@ export function ContactForm({ successMessage }: { successMessage: string }) {
 
   if (done) {
     return (
-      <div className="mt-panel border border-[var(--line)] bg-[var(--surface)] p-8 text-[var(--primary)]" role="status">
+      <div className="mt-panel border border-[var(--line)] bg-[var(--surface)] p-8 shadow-[var(--shadow-soft)] text-[var(--primary)] md:p-10" role="status">
         <p className="font-semibold">{t("success")}</p>
         <p className="mt-2 text-sm text-[var(--muted-foreground)]">{successMessage}</p>
         <Button className="mt-4" variant="outline" onClick={() => setDone(false)}>
@@ -57,9 +57,15 @@ export function ContactForm({ successMessage }: { successMessage: string }) {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="space-y-5 border border-[var(--line)] bg-[var(--surface)] p-6 md:p-8"
+      className="space-y-6 border border-[var(--line)] bg-[var(--surface)] p-7 shadow-[var(--shadow-soft)] md:p-10"
       dir={locale === "ar" ? "rtl" : "ltr"}
     >
+      <div className="border-b border-[var(--line)] pb-5">
+        <p className="eyebrow mb-2">{locale === "ar" ? "تواصل" : "Contact"}</p>
+        <h2 className="font-display text-xl font-semibold tracking-tight text-[var(--primary)] md:text-2xl">
+          {locale === "ar" ? "أرسل رسالتك" : "Send a message"}
+        </h2>
+      </div>
       <div>
         <Label htmlFor="name">{t("name")}</Label>
         <Input id="name" {...register("name")} />
