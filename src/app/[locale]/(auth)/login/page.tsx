@@ -17,7 +17,7 @@ export default async function LoginPage({
     error === "forbidden" || error === "inactive" ? error : null;
 
   return (
-    <div className="flex min-h-screen items-center px-[var(--page-gutter)] pt-24 pb-16">
+    <div className="flex min-h-[calc(100svh-var(--header-height))] items-center px-[var(--page-gutter)] pt-24 pb-16">
       <LoginForm nextPath={next} accessError={accessError} />
     </div>
   );

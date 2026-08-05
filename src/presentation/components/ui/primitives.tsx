@@ -14,7 +14,7 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, React.ComponentPro
   ({ className, ...props }, ref) => (
     <textarea
       className={cn(
-        "flex min-h-28 w-full max-w-full rounded-[var(--radius)] border border-[var(--border)] bg-white px-3 py-2 text-base shadow-sm placeholder:text-[var(--muted-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm dark:bg-[var(--surface)]",
+        "flex min-h-28 w-full max-w-full rounded-[var(--radius)] border border-[var(--line)] bg-white px-3 py-2 text-base shadow-sm placeholder:text-[var(--muted-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)] disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm dark:bg-[var(--surface)]",
         className,
       )}
       ref={ref}
@@ -25,7 +25,12 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, React.ComponentPro
 Textarea.displayName = "Textarea";
 
 export function Card({ className, ...props }: React.ComponentProps<"div">) {
-  return <div className={cn("glass rounded-2xl p-6", className)} {...props} />;
+  return (
+    <div
+      className={cn("mt-panel rounded-[var(--radius)] p-6 shadow-[var(--shadow-soft)]", className)}
+      {...props}
+    />
+  );
 }
 
 export function Badge({
@@ -35,7 +40,7 @@ export function Badge({
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold",
+        "inline-flex items-center rounded-[var(--radius)] px-2.5 py-0.5 text-xs font-semibold",
         "bg-[var(--muted)] text-[var(--foreground)]",
         className,
       )}
@@ -65,13 +70,13 @@ export function Switch({
       aria-checked={checked}
       onClick={() => onCheckedChange(!checked)}
       className={cn(
-        "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border transition-colors",
+        "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-[var(--radius)] border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]",
         checked ? "border-[var(--accent)] bg-[var(--accent)]" : "border-[var(--border)] bg-[var(--muted)]",
       )}
     >
       <span
         className={cn(
-          "pointer-events-none block h-5 w-5 translate-x-0.5 rounded-full bg-white shadow transition-transform",
+          "pointer-events-none block h-5 w-5 translate-x-0.5 rounded-[var(--radius)] bg-white shadow transition-transform",
           checked && "translate-x-[1.35rem]",
         )}
       />

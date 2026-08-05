@@ -19,9 +19,10 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="flex min-h-[50vh] flex-col items-center justify-center gap-5 px-[var(--page-gutter)] pt-24 text-center">
-      <h1 className="font-display text-3xl font-semibold tracking-tight text-[var(--primary)]">{t("error")}</h1>
-      <p className="max-w-md text-sm leading-relaxed text-[var(--muted-foreground)]">{error.message}</p>
+    <div className="flex min-h-[70vh] flex-col items-center justify-center gap-5 px-[var(--page-gutter)] pt-24 text-center">
+      <h1 className="font-display text-h2 font-semibold tracking-tight text-[var(--primary)]">
+        {t("error")}
+      </h1>
       <Button variant="accent" onClick={reset}>
         {t("retry")}
       </Button>

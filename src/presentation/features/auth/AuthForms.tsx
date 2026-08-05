@@ -10,7 +10,20 @@ import { loginAction, forgotPasswordAction, resetPasswordAction } from "@/action
 import { Button } from "@/presentation/components/ui/button";
 import { Input } from "@/presentation/components/ui/input";
 import { Label } from "@/presentation/components/ui/primitives";
-import { SuccessBanner } from "@/presentation/components/admin/AsyncStates";
+
+const authLinkClass =
+  "block text-center text-sm text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]";
+
+function AuthSuccess({ message }: { message: string }) {
+  return (
+    <div
+      role="status"
+      className="rounded-[var(--radius)] border border-[var(--line)] bg-[var(--muted)] px-4 py-3 text-sm font-medium text-[var(--primary)]"
+    >
+      {message}
+    </div>
+  );
+}
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -41,7 +54,7 @@ export function LoginForm({
 
   return (
     <form
-      className="mt-panel mx-auto w-full max-w-md space-y-5 border border-[var(--line)] bg-[var(--surface)] p-6 shadow-[var(--shadow-soft)] sm:p-9"
+      className="mt-panel mx-auto w-full max-w-md space-y-5 rounded-[var(--radius)] p-6 shadow-[var(--shadow-soft)] sm:p-9"
       onSubmit={handleSubmit((values) => {
         setError(null);
         startTransition(async () => {
@@ -65,19 +78,23 @@ export function LoginForm({
           {...register("password")}
         />
       </div>
-      <label className="flex items-center gap-2 text-sm">
-        <input type="checkbox" {...register("remember")} />
+      <label className="flex min-h-11 cursor-pointer items-center gap-3 text-sm">
+        <input
+          type="checkbox"
+          className="h-5 w-5 shrink-0 rounded-[var(--radius)] border border-[var(--line)] accent-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+          {...register("remember")}
+        />
         {t("rememberMe")}
       </label>
       {error ? (
-        <p className="text-sm text-red-600" role="alert">
+        <p className="text-sm text-[var(--warning)]" role="alert">
           {error}
         </p>
       ) : null}
       <Button type="submit" variant="accent" className="w-full" disabled={pending}>
         {pending ? common("loading") : t("login")}
       </Button>
-      <Link href={`/${locale}/forgot-password`} className="block text-center text-sm text-[var(--accent)]">
+      <Link href={`/${locale}/forgot-password`} className={authLinkClass}>
         {t("forgotPassword")}
       </Link>
     </form>
@@ -94,7 +111,7 @@ export function ForgotPasswordForm() {
 
   return (
     <form
-      className="mt-panel mx-auto w-full max-w-md space-y-5 border border-[var(--line)] bg-[var(--surface)] p-6 shadow-[var(--shadow-soft)] sm:p-9"
+      className="mt-panel mx-auto w-full max-w-md space-y-5 rounded-[var(--radius)] p-6 shadow-[var(--shadow-soft)] sm:p-9"
       onSubmit={handleSubmit((values) => {
         startTransition(async () => {
           const res = await forgotPasswordAction(values.email, locale);
@@ -108,11 +125,11 @@ export function ForgotPasswordForm() {
         <Label htmlFor="forgot-email">{t("email")}</Label>
         <Input id="forgot-email" type="email" autoComplete="email" {...register("email")} />
       </div>
-      {done ? <SuccessBanner message={t("resetSent")} /> : null}
+      {done ? <AuthSuccess message={t("resetSent")} /> : null}
       <Button type="submit" variant="accent" className="w-full" disabled={pending}>
         {pending ? common("loading") : t("sendResetLink")}
       </Button>
-      <Link href={`/${locale}/login`} className="block text-center text-sm text-[var(--accent)]">
+      <Link href={`/${locale}/login`} className={authLinkClass}>
         {t("backToLogin")}
       </Link>
     </form>
@@ -129,7 +146,7 @@ export function ResetPasswordForm() {
 
   return (
     <form
-      className="mt-panel mx-auto w-full max-w-md space-y-5 border border-[var(--line)] bg-[var(--surface)] p-6 shadow-[var(--shadow-soft)] sm:p-9"
+      className="mt-panel mx-auto w-full max-w-md space-y-5 rounded-[var(--radius)] p-6 shadow-[var(--shadow-soft)] sm:p-9"
       onSubmit={handleSubmit((values) => {
         if (values.password !== values.confirm) {
           setMessage("mismatch");
@@ -156,16 +173,16 @@ export function ResetPasswordForm() {
           {...register("confirm")}
         />
       </div>
-      {message === "ok" ? <SuccessBanner message={common("success")} /> : null}
+      {message === "ok" ? <AuthSuccess message={common("success")} /> : null}
       {message === "mismatch" ? (
-        <p className="text-sm text-red-600" role="alert">
+        <p className="text-sm text-[var(--warning)]" role="alert">
           {common("passwordMismatch")}
         </p>
       ) : null}
       <Button type="submit" variant="accent" className="w-full" disabled={pending}>
         {pending ? common("loading") : t("updatePassword")}
       </Button>
-      <Link href={`/${locale}/login`} className="block text-center text-sm text-[var(--accent)]">
+      <Link href={`/${locale}/login`} className={authLinkClass}>
         {t("backToLogin")}
       </Link>
     </form>

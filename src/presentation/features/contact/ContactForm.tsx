@@ -9,6 +9,7 @@ import { submitContactMessage } from "@/actions/contact";
 import { Button } from "@/presentation/components/ui/button";
 import { Input } from "@/presentation/components/ui/input";
 import { Label, Textarea } from "@/presentation/components/ui/primitives";
+import { cn } from "@/lib/utils";
 
 const schema = z.object({
   name: z.string().min(2),
@@ -44,7 +45,7 @@ export function ContactForm({ successMessage }: { successMessage: string }) {
 
   if (done) {
     return (
-      <div className="mt-panel border border-[var(--line)] bg-[var(--surface)] p-8 shadow-[var(--shadow-soft)] text-[var(--primary)] md:p-10" role="status">
+      <div className="mt-panel rounded-[var(--radius)] p-8 shadow-[var(--shadow-soft)] text-[var(--primary)] md:p-10" role="status">
         <p className="font-semibold">{t("success")}</p>
         <p className="mt-2 text-sm text-[var(--muted-foreground)]">{successMessage}</p>
         <Button className="mt-4" variant="outline" onClick={() => setDone(false)}>
@@ -57,8 +58,9 @@ export function ContactForm({ successMessage }: { successMessage: string }) {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="space-y-6 border border-[var(--line)] bg-[var(--surface)] p-7 shadow-[var(--shadow-soft)] md:p-10"
+      className="mt-panel space-y-6 rounded-[var(--radius)] p-7 shadow-[var(--shadow-soft)] md:p-10"
       dir={locale === "ar" ? "rtl" : "ltr"}
+      noValidate
     >
       <div className="border-b border-[var(--line)] pb-5">
         <p className="eyebrow mb-2">{locale === "ar" ? "تواصل" : "Contact"}</p>
@@ -68,13 +70,32 @@ export function ContactForm({ successMessage }: { successMessage: string }) {
       </div>
       <div>
         <Label htmlFor="name">{t("name")}</Label>
-        <Input id="name" {...register("name")} />
-        {errors.name ? <p className="mt-1 text-xs text-red-600">{t("required")}</p> : null}
+        <Input
+          id="name"
+          aria-invalid={errors.name ? true : undefined}
+          className={cn(errors.name && "border-[var(--warning)]")}
+          {...register("name")}
+        />
+        {errors.name ? (
+          <p className="mt-1 text-xs text-[var(--warning)]" role="alert">
+            {t("required")}
+          </p>
+        ) : null}
       </div>
       <div>
         <Label htmlFor="email">{t("email")}</Label>
-        <Input id="email" type="email" {...register("email")} />
-        {errors.email ? <p className="mt-1 text-xs text-red-600">{t("required")}</p> : null}
+        <Input
+          id="email"
+          type="email"
+          aria-invalid={errors.email ? true : undefined}
+          className={cn(errors.email && "border-[var(--warning)]")}
+          {...register("email")}
+        />
+        {errors.email ? (
+          <p className="mt-1 text-xs text-[var(--warning)]" role="alert">
+            {t("required")}
+          </p>
+        ) : null}
       </div>
       <div>
         <Label htmlFor="phone">{t("phone")}</Label>
@@ -86,8 +107,17 @@ export function ContactForm({ successMessage }: { successMessage: string }) {
       </div>
       <div>
         <Label htmlFor="message">{t("message")}</Label>
-        <Textarea id="message" {...register("message")} />
-        {errors.message ? <p className="mt-1 text-xs text-red-600">{t("required")}</p> : null}
+        <Textarea
+          id="message"
+          aria-invalid={errors.message ? true : undefined}
+          className={cn(errors.message && "border-[var(--warning)]")}
+          {...register("message")}
+        />
+        {errors.message ? (
+          <p className="mt-1 text-xs text-[var(--warning)]" role="alert">
+            {t("required")}
+          </p>
+        ) : null}
       </div>
       <Button type="submit" variant="accent" disabled={pending} className="w-full">
         {pending ? t("loading") : t("sendMessage")}

@@ -34,13 +34,27 @@ export default async function LocaleLayout({
   const tagline = site.tagline_i18n[locale] ?? site.tagline_i18n.en ?? "";
   const dir = getDirection(locale);
 
+  // Normalize legacy terracotta / soft-radius CMS theme to current engineering tokens.
+  const accentRaw = (theme.accent_color ?? "").trim().toLowerCase();
+  const accent =
+    accentRaw === "#e87722" || accentRaw === "#e36a1a" ? "#1e5eff" : theme.accent_color;
+  const radius =
+    theme.border_radius === "0.75rem" || theme.border_radius === "0.5rem"
+      ? "0.125rem"
+      : theme.border_radius;
+  const background =
+    (theme.background_color ?? "").trim().toLowerCase() === "#ffffff"
+      ? "#f4f6f9"
+      : theme.background_color;
+
   const cssVars = {
     ["--primary" as string]: theme.primary_color,
     ["--secondary" as string]: theme.secondary_color,
-    ["--accent" as string]: theme.accent_color,
-    ["--background" as string]: theme.background_color,
+    ["--accent" as string]: accent,
+    ["--ring" as string]: accent,
+    ["--background" as string]: background,
     ["--foreground" as string]: theme.foreground_color,
-    ["--radius" as string]: theme.border_radius,
+    ["--radius" as string]: radius,
   };
 
   return (

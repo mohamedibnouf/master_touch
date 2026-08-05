@@ -6,7 +6,7 @@ export default async function ResetPasswordPage({ params }: { params: Promise<{ 
   const { locale } = await params;
   setRequestLocale(locale as Locale);
   return (
-    <div className="flex min-h-screen items-center px-[var(--page-gutter)] pt-24 pb-16">
+    <div className="flex min-h-[calc(100svh-var(--header-height))] items-center px-[var(--page-gutter)] pt-24 pb-16">
       <ResetPasswordForm />
     </div>
   );

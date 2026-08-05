@@ -110,7 +110,7 @@ export default async function ServiceDetailPage({
             <h2 className="mb-10 font-display text-h2 font-semibold tracking-tight text-[var(--primary)] md:mb-12">
               {t("relatedServices")}
             </h2>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2">
               {related.map((s, i) => (
                 <ServiceCard key={s.id} service={s} locale={locale} index={i} />
               ))}

@@ -38,9 +38,9 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
       />
       <section className="services-engineering section-pad">
         <div className="container-mt">
-          <div className="mb-16 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <div className="mb-14 flex flex-col gap-6 md:mb-16 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-2xl">
-              <p className="eyebrow mb-4">Systems</p>
+              <p className="eyebrow mb-4">{locale === "ar" ? "الأنظمة" : "Systems"}</p>
               <h2 className="font-display text-h2 font-semibold tracking-tight text-[var(--primary)]">
                 {t("servicesWhatWeDeliver")}
               </h2>
@@ -49,20 +49,34 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
               </p>
             </div>
             <span className="text-[0.65rem] font-semibold tracking-[0.22em] uppercase text-[var(--muted-foreground)]">
-              {String(services.length).padStart(2, "0")} disciplines
+              {String(services.length).padStart(2, "0")}{" "}
+              {locale === "ar" ? "تخصصات" : "disciplines"}
             </span>
           </div>
-          <div className="grid gap-6 md:grid-cols-2">
-            {services.map((service, i) => (
-              <ServiceCard
-                key={service.id}
-                service={service}
-                locale={locale}
-                featured={i === 0}
-                index={i}
-              />
-            ))}
-          </div>
+          {services.length ? (
+            <div className="grid gap-6 md:grid-cols-2">
+              {services.map((service, i) => (
+                <ServiceCard
+                  key={service.id}
+                  service={service}
+                  locale={locale}
+                  featured={i === 0}
+                  index={i}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-[var(--radius)] border border-dashed border-[var(--line)] bg-[var(--surface)] p-10 text-center shadow-[var(--shadow-soft)]">
+              <p className="font-semibold text-[var(--primary)]">
+                {locale === "ar" ? "لا توجد خدمات حالياً" : "No services available yet"}
+              </p>
+              <p className="mt-2 text-sm text-[var(--muted-foreground)]">
+                {locale === "ar"
+                  ? "يرجى العودة لاحقاً أو التواصل معنا مباشرة."
+                  : "Please check back later or contact us directly."}
+              </p>
+            </div>
+          )}
         </div>
       </section>
     </div>

@@ -32,7 +32,7 @@ export function LocaleSwitcher({ compact }: { compact?: boolean }) {
       <Link
         href={switchLocale("ar")}
         className={cn(
-          "inline-flex min-h-11 min-w-9 items-center justify-center px-1.5 py-1 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]",
+          "inline-flex min-h-11 min-w-9 items-center justify-center px-1.5 py-1 text-xs font-semibold tracking-wide transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]",
           locale === "ar"
             ? compact
               ? "text-[var(--accent)]"
@@ -45,13 +45,13 @@ export function LocaleSwitcher({ compact }: { compact?: boolean }) {
       >
         ع
       </Link>
-      <span aria-hidden className="opacity-40">
+      <span aria-hidden className="opacity-40 text-xs">
         /
       </span>
       <Link
         href={switchLocale("en")}
         className={cn(
-          "inline-flex min-h-11 min-w-9 items-center justify-center px-1.5 py-1 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]",
+          "inline-flex min-h-11 min-w-9 items-center justify-center px-1.5 py-1 text-xs font-semibold tracking-wide transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]",
           locale === "en"
             ? compact
               ? "text-[var(--accent)]"
@@ -146,7 +146,7 @@ export function SiteHeader({ brand }: { brand: string }) {
     <>
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:start-4 focus:top-4 focus:z-[60] focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-[var(--primary)] focus:shadow"
+        className="sr-only focus:not-sr-only focus:absolute focus:start-4 focus:top-4 focus:z-[60] focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-[var(--primary)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
       >
         {common("skipToContent")}
       </a>
@@ -187,7 +187,7 @@ export function SiteHeader({ brand }: { brand: string }) {
                 >
                   {link.label}
                   {active ? (
-                    <span className="absolute -bottom-0.5 inset-x-3 mx-auto h-0.5 rounded-full bg-[var(--accent)]" />
+                    <span className="absolute -bottom-0.5 inset-x-3 mx-auto h-px bg-[var(--accent)]" />
                   ) : null}
                 </Link>
               );
@@ -198,7 +198,7 @@ export function SiteHeader({ brand }: { brand: string }) {
             <LocaleSwitcher />
             <Link
               href={`/${locale}/contact`}
-              className="hidden min-h-11 items-center bg-[var(--accent)] px-5 text-[0.7rem] font-semibold tracking-[0.14em] uppercase text-white shadow-[0_10px_24px_rgba(30,94,255,0.35)] transition hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] lg:inline-flex rtl:tracking-normal"
+              className="hidden min-h-11 items-center rounded-[var(--radius)] bg-[var(--accent)] px-5 text-[0.7rem] font-semibold tracking-[0.14em] uppercase text-white shadow-[var(--shadow-cta)] transition hover:brightness-110 hover:shadow-[var(--shadow-cta-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[#06101c] lg:inline-flex rtl:tracking-normal"
             >
               {t("contact")}
             </Link>
@@ -234,7 +234,7 @@ export function SiteHeader({ brand }: { brand: string }) {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="flex min-h-12 items-center px-2 py-3 text-base font-medium tracking-wide text-white/90"
+                    className="flex min-h-12 items-center px-2 py-3 text-base font-medium tracking-wide text-white/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
                     onClick={() => setOpen(false)}
                   >
                     {link.label}
@@ -244,7 +244,7 @@ export function SiteHeader({ brand }: { brand: string }) {
               <li className="pt-3">
                 <Link
                   href={`/${locale}/contact`}
-                  className="flex min-h-12 items-center justify-center bg-[var(--accent)] px-4 text-sm font-semibold tracking-[0.14em] uppercase text-white"
+                  className="flex min-h-12 items-center justify-center rounded-[var(--radius)] bg-[var(--accent)] px-4 text-sm font-semibold tracking-[0.14em] uppercase text-white shadow-[var(--shadow-cta)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
                   onClick={() => setOpen(false)}
                 >
                   {t("contact")}
@@ -289,8 +289,12 @@ export function SiteFooter({
             <p className="font-display text-[0.65rem] tracking-[0.22em] text-[var(--accent)]">
               MASTER TOUCH
             </p>
-            <Link href={`/${locale}`} className="mt-5 inline-flex" aria-label={brand}>
-              <BrandLogo className="h-16 w-[13rem] sm:h-[4.5rem] sm:w-[15rem]" sizes="240px" />
+            <Link
+              href={`/${locale}`}
+              className="mt-5 inline-flex focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+              aria-label={brand}
+            >
+              <BrandLogo className="h-12 w-[10rem] sm:h-14 sm:w-[12rem]" sizes="192px" />
             </Link>
             <p className="mt-6 max-w-md text-sm leading-relaxed text-white/65">
               {tagline || t("tagline")}
@@ -303,10 +307,10 @@ export function SiteFooter({
             </div>
             <Link
               href={`/${locale}/contact`}
-              className="mt-9 inline-flex min-h-11 items-center gap-2 bg-[var(--accent)] px-5 text-[0.7rem] font-semibold tracking-[0.14em] uppercase text-white shadow-[0_10px_24px_rgba(30,94,255,0.3)] transition hover:brightness-110"
+              className="mt-9 inline-flex min-h-11 items-center gap-2 rounded-[var(--radius)] bg-[var(--accent)] px-5 text-[0.7rem] font-semibold tracking-[0.14em] uppercase text-white shadow-[var(--shadow-cta)] transition hover:brightness-110 hover:shadow-[var(--shadow-cta-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[#06101c]"
             >
               {nav("contact")}
-              <ArrowUpRight className="h-3.5 w-3.5" aria-hidden />
+              <ArrowUpRight className="h-4 w-4" aria-hidden />
             </Link>
           </div>
 
@@ -330,13 +334,13 @@ export function SiteFooter({
               <ul className="mt-5 space-y-1">
                 <li>
                   <a className="site-footer__link" href="mailto:info@mastertouchksa.com">
-                    <Mail className="h-3.5 w-3.5 shrink-0 text-[var(--accent)]" aria-hidden />
+                    <Mail className="h-4 w-4 shrink-0 text-[var(--accent)]" aria-hidden />
                     <span className="break-all">info@mastertouchksa.com</span>
                   </a>
                 </li>
                 <li>
                   <a className="site-footer__link" href="tel:+966506834610" dir="ltr">
-                    <Phone className="h-3.5 w-3.5 shrink-0 text-[var(--accent)]" aria-hidden />
+                    <Phone className="h-4 w-4 shrink-0 text-[var(--accent)]" aria-hidden />
                     +966-50-683-4610
                   </a>
                 </li>
@@ -347,7 +351,7 @@ export function SiteFooter({
                     rel="noopener noreferrer"
                     target="_blank"
                   >
-                    <Globe className="h-3.5 w-3.5 shrink-0 text-[var(--accent)]" aria-hidden />
+                    <Globe className="h-4 w-4 shrink-0 text-[var(--accent)]" aria-hidden />
                     <span className="break-all">www.mastertouchksa.com</span>
                   </a>
                 </li>
@@ -357,7 +361,7 @@ export function SiteFooter({
             <div className="site-footer__col sm:col-span-2 lg:col-span-1">
               <p className="site-footer__heading">{locale === "ar" ? "المقر" : "Headquarters"}</p>
               <div className="mt-5 flex gap-3 text-sm leading-relaxed text-white/70">
-                <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[var(--accent)]" aria-hidden />
+                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[var(--accent)]" aria-hidden />
                 <p>
                   {locale === "ar"
                     ? "الرياض، المملكة العربية السعودية"
@@ -365,10 +369,13 @@ export function SiteFooter({
                 </p>
               </div>
               <div className="mt-7 flex flex-wrap gap-2">
-                {["Finishing", "Smart", "AV", "Fit-out"].map((tag) => (
+                {(locale === "ar"
+                  ? ["تشطيب", "ذكي", "AV", "تعاقد"]
+                  : ["Finishing", "Smart", "AV", "Fit-out"]
+                ).map((tag) => (
                   <span
                     key={tag}
-                    className="border border-white/15 bg-white/[0.03] px-2.5 py-1 text-[0.65rem] font-semibold tracking-[0.12em] uppercase text-white/55"
+                    className="rounded-[var(--radius)] border border-white/15 bg-white/[0.03] px-2.5 py-1 text-[0.65rem] font-semibold tracking-[0.12em] uppercase text-white/55"
                   >
                     {tag}
                   </span>

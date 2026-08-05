@@ -1,4 +1,5 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import Image from "next/image";
 import type { Locale } from "@/lib/i18n/config";
 import { getAboutContent, getPageSeo } from "@/infrastructure/repositories/content.repository";
 import {
@@ -38,18 +39,14 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
       ? `${about.history.slice(0, 160)}…`
       : about.history
     : null;
+  const coverSrc =
+    !about.cover_image_url || about.cover_image_url.includes("placeholders/about-cover")
+      ? "/images/about-company.png"
+      : about.cover_image_url;
 
   return (
     <div>
-      <PageHero
-        title={t("aboutTitle")}
-        subtitle={excerpt}
-        imageSrc={
-          !about.cover_image_url || about.cover_image_url.includes("placeholders/about-cover")
-            ? "/images/about-company.png"
-            : about.cover_image_url
-        }
-      />
+      <PageHero title={t("aboutTitle")} subtitle={excerpt} imageSrc={coverSrc} />
 
       <section className="section-pad">
         <div className="container-mt grid items-start gap-14 lg:grid-cols-12 lg:gap-16">
@@ -65,15 +62,12 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
             ) : null}
           </div>
           <div className="image-frame relative min-h-[22rem] overflow-hidden shadow-[var(--shadow-soft)] lg:col-span-5 lg:min-h-[30rem]">
-            {/* eslint-disable-next-line @next/next/no-img-element -- local SVG placeholders */}
-            <img
-              src={
-                !about.cover_image_url || about.cover_image_url.includes("placeholders/about-cover")
-                  ? "/images/about-company.png"
-                  : about.cover_image_url
-              }
-              alt=""
-              className="absolute inset-0 h-full w-full object-cover"
+            <Image
+              src={coverSrc}
+              alt={t("aboutTitle")}
+              fill
+              sizes="(max-width:1024px) 100vw, 40vw"
+              className="object-cover"
             />
           </div>
         </div>
@@ -112,7 +106,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
           <div className="grid gap-x-10 gap-y-14 sm:grid-cols-2 lg:grid-cols-4">
             {about.stats.map((s) => (
               <div key={s.id} className="min-w-0 border-s-2 border-[var(--accent)]/35 ps-6">
-                <p className="font-display text-[clamp(2.5rem,5.5vw,3.75rem)] font-semibold tracking-tight text-[var(--primary)]">
+                <p className="font-display text-[clamp(2.5rem,5.5vw,3.85rem)] font-semibold tracking-tight text-[var(--primary)]">
                   {s.value}
                 </p>
                 <p className="mt-3 text-sm leading-relaxed text-[var(--muted-foreground)]">{s.label}</p>

@@ -12,14 +12,14 @@ INSERT INTO public.theme_settings (
 )
 VALUES (
   '22222222-2222-2222-2222-222222222001',
-  '#0B1F3A',
-  '#132F54',
-  '#E87722',
-  '#FFFFFF',
-  '#0F172A',
-  'Manrope',
-  'Cormorant Garamond',
-  '0.75rem',
+  '#0a1b33',
+  '#132a4a',
+  '#1e5eff',
+  '#f4f6f9',
+  '#0a1628',
+  'Source Sans 3',
+  'Outfit',
+  '0.125rem',
   TRUE
 )
 ON CONFLICT (id) DO NOTHING;

@@ -35,8 +35,8 @@ export default function DashboardCharts() {
       {
         label: t("visitors"),
         data: [120, 190, 150, 220, 280, 240, 300],
-        borderColor: "#E87722",
-        backgroundColor: "rgba(232,119,34,0.15)",
+        borderColor: "#1e5eff",
+        backgroundColor: "rgba(30,94,255,0.15)",
         fill: true,
         tension: 0.35,
       },
@@ -49,7 +49,7 @@ export default function DashboardCharts() {
       {
         label: t("messages"),
         data: [12, 8, 5, 3],
-        backgroundColor: ["#0B1F3A", "#132F54", "#E87722", "#94a3b8"],
+        backgroundColor: ["#0a1b33", "#132a4a", "#1e5eff", "#94a3b8"],
       },
     ],
   };

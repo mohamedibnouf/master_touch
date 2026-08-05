@@ -3,7 +3,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { motion, AnimatePresence, useInView, useMotionValue, useSpring } from "framer-motion";
+import { useLocale } from "next-intl";
+import { motion, AnimatePresence, useInView, useMotionValue, useSpring, useReducedMotion } from "framer-motion";
 import type { AboutValue, HomepageSection, HomepageSlide, ServiceItem } from "@/types/cms";
 import { Button } from "@/presentation/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -57,13 +58,14 @@ export function SectionHeading({
   light?: boolean;
   eyebrow?: string | null;
 }) {
+  const reduceMotion = useReducedMotion();
   return (
     <motion.div
       className="mb-14 max-w-2xl md:mb-16"
-      initial={{ opacity: 0, y: 20 }}
+      initial={reduceMotion ? false : { opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: reduceMotion ? 0 : 0.55, ease: [0.22, 1, 0.36, 1] }}
     >
       {eyebrow ? <p className="eyebrow mb-4">{eyebrow}</p> : null}
       <h2
@@ -144,12 +146,13 @@ export function HeroSlider({
     [section.slides],
   );
   const [index, setIndex] = useState(0);
+  const reduceMotion = useReducedMotion();
 
   useEffect(() => {
-    if (slides.length < 2) return;
+    if (slides.length < 2 || reduceMotion) return;
     const id = setInterval(() => setIndex((i) => (i + 1) % slides.length), 7000);
     return () => clearInterval(id);
-  }, [slides.length]);
+  }, [slides.length, reduceMotion]);
 
   const slide: HomepageSlide | undefined = slides[index] ?? slides[0];
   const media =
@@ -163,10 +166,10 @@ export function HeroSlider({
         <motion.div
           key={media}
           className="absolute inset-0"
-          initial={{ opacity: 0, scale: 1.04 }}
+          initial={reduceMotion ? false : { opacity: 0, scale: 1.04 }}
           animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+          exit={reduceMotion ? undefined : { opacity: 0 }}
+          transition={{ duration: reduceMotion ? 0 : 1, ease: [0.22, 1, 0.36, 1] }}
         >
           <MediaFill
             src={media}
@@ -182,18 +185,18 @@ export function HeroSlider({
 
       <div className="relative container-mt flex min-h-[100svh] flex-col justify-end px-[var(--page-gutter)] pb-[max(4rem,calc(env(safe-area-inset-bottom,0px)+3rem))] pt-[calc(var(--header-height)+2.5rem+env(safe-area-inset-top,0px))] md:justify-center md:pb-28">
         <motion.p
-          initial={{ opacity: 0, y: 18 }}
+          initial={reduceMotion ? false : { opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.08 }}
+          transition={{ duration: reduceMotion ? 0 : 0.7, delay: reduceMotion ? 0 : 0.08 }}
           className="eyebrow mb-5 text-white"
         >
           {locale === "ar" ? "حلول هندسية متكاملة" : "Integrated engineering solutions"}
         </motion.p>
         <motion.p
-          initial={{ opacity: 0, y: 18 }}
+          initial={reduceMotion ? false : { opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.14 }}
-          className="font-display text-display font-semibold tracking-tight text-white"
+          transition={{ duration: reduceMotion ? 0 : 0.7, delay: reduceMotion ? 0 : 0.14 }}
+          className="text-sm font-medium tracking-[0.08em] text-white/75 md:text-base"
         >
           {section.title}
         </motion.p>
@@ -201,13 +204,13 @@ export function HeroSlider({
         <AnimatePresence mode="wait">
           <motion.div
             key={slide?.id ?? "fallback"}
-            initial={{ opacity: 0, y: 28 }}
+            initial={reduceMotion ? false : { opacity: 0, y: 28 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -16 }}
-            transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-            className="mt-8 max-w-xl"
+            exit={reduceMotion ? undefined : { opacity: 0, y: -16 }}
+            transition={{ duration: reduceMotion ? 0 : 0.55, ease: [0.22, 1, 0.36, 1] }}
+            className="mt-6 max-w-xl"
           >
-            <h1 className="text-xl font-medium text-white/95 md:text-2xl">
+            <h1 className="font-display text-display font-semibold tracking-tight text-white">
               {slide?.title ?? section.subtitle}
             </h1>
             <p className="mt-4 text-base leading-relaxed text-white/70 md:text-lg">
@@ -387,10 +390,11 @@ export function ValuesShowcase({
   subtitle?: string | null;
   items: Array<{ key: string; icon: string; title: string; description: string }>;
 }) {
+  const locale = useLocale();
   return (
     <section className="values-blueprint section-pad">
       <div className="container-mt">
-        <div className="mb-14 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+        <div className="mb-14 flex flex-col gap-8 md:mb-16 lg:flex-row lg:items-end lg:justify-between">
           <motion.div
             className="max-w-2xl"
             initial={{ opacity: 0, y: 20 }}
@@ -398,7 +402,7 @@ export function ValuesShowcase({
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
           >
-            <p className="eyebrow mb-4">Specifications</p>
+            <p className="eyebrow mb-4">{locale === "ar" ? "المواصفات" : "Specifications"}</p>
             <h2 className="font-display text-h2 font-semibold tracking-tight text-[var(--primary)]">
               {title}
             </h2>
@@ -418,7 +422,8 @@ export function ValuesShowcase({
           >
             <span className="inline-block h-8 w-8 border border-[var(--line)]" />
             <span>
-              {String(items.length).padStart(2, "0")} modules
+              {String(items.length).padStart(2, "0")}{" "}
+              {locale === "ar" ? "وحدات" : "modules"}
             </span>
           </motion.div>
         </div>
@@ -487,13 +492,18 @@ export function ServiceCard({
   const Icon = iconMap[service.icon ?? ""] ?? BriefcaseFallback;
   const cover = service.cover_image_url;
   const code = `SRV-${String(index + 1).padStart(2, "0")}`;
+  const reduceMotion = useReducedMotion();
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 28 }}
+      initial={reduceMotion ? false : { opacity: 0, y: 28 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
-      transition={{ delay: Math.min(index, 5) * 0.07, duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+      transition={{
+        delay: reduceMotion ? 0 : Math.min(index, 5) * 0.07,
+        duration: reduceMotion ? 0 : 0.55,
+        ease: [0.22, 1, 0.36, 1],
+      }}
       className={cn(featured ? "md:col-span-2" : "")}
     >
       <Link
@@ -512,12 +522,16 @@ export function ServiceCard({
           {cover ? (
             <MediaFill
               src={cover}
-              sizes={featured ? "(max-width:768px) 100vw, 50vw" : "(max-width:768px) 100vw, 50vw"}
-              className="object-cover transition duration-700 group-hover:scale-[1.04]"
+              sizes={
+                featured
+                  ? "(max-width:768px) 100vw, 50vw"
+                  : "(max-width:768px) 100vw, (max-width:1280px) 50vw, 33vw"
+              }
+              className="object-cover"
             />
           ) : (
             <div className="flex h-full min-h-52 items-center justify-center bg-[linear-gradient(145deg,#06101c,#132a4a)]">
-              <Icon className="h-12 w-12 text-[var(--accent)]" />
+              <Icon className="h-10 w-10 text-[var(--accent)]" />
             </div>
           )}
           <div className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-t from-[rgba(6,16,28,0.55)] via-transparent to-transparent opacity-80 transition duration-500 group-hover:opacity-95" />
@@ -529,7 +543,7 @@ export function ServiceCard({
           <div>
             <div className="mb-6 flex items-center justify-between gap-3">
               <div className="value-module__icon !my-0 text-[var(--accent)]">
-                <Icon className="h-5 w-5 transition duration-500 group-hover:scale-110" aria-hidden />
+                <Icon className="h-5 w-5" aria-hidden />
               </div>
               <span className="font-display text-[0.65rem] tracking-[0.2em] text-[var(--muted-foreground)]">
                 {code}
@@ -547,7 +561,7 @@ export function ServiceCard({
             <span className="min-w-0 text-[0.65rem] font-semibold tracking-[0.2em] uppercase text-[var(--primary)]/55 transition group-hover:text-[var(--accent)] rtl:tracking-normal">
               {locale === "ar" ? "استكشف الخدمة" : "Explore system"}
             </span>
-            <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center border border-[var(--line)] text-[var(--primary)] transition group-hover:border-[var(--accent)] group-hover:bg-[var(--accent)] group-hover:text-white">
+            <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center border border-[var(--line)] text-[var(--primary)] transition group-hover:border-[var(--accent)] group-hover:bg-[var(--accent)] group-hover:text-white">
               <ArrowUpRight className="h-4 w-4" aria-hidden />
             </span>
           </div>
@@ -571,13 +585,14 @@ function BriefcaseIcon({ className }: { className?: string }) {
 }
 
 export function CtaBanner({ section, locale }: { section: HomepageSection; locale: string }) {
+  const reduceMotion = useReducedMotion();
   return (
     <section className="section-pad">
       <motion.div
-        initial={{ opacity: 0, y: 24 }}
+        initial={reduceMotion ? false : { opacity: 0, y: 24 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        transition={{ duration: 0.6 }}
+        transition={{ duration: reduceMotion ? 0 : 0.6 }}
         className="cta-engineering container-mt"
       >
         <div className="cta-engineering__grid" aria-hidden />
@@ -643,11 +658,12 @@ export function CtaBanner({ section, locale }: { section: HomepageSection; local
 export function ContactMap({ embedUrl }: { embedUrl: string | null }) {
   if (!embedUrl) return null;
   return (
-    <div className="overflow-hidden border border-[var(--line)] bg-[var(--surface)] shadow-[var(--shadow-soft)]">
+    <div className="relative overflow-hidden rounded-[var(--radius)] border border-[var(--line)] bg-[var(--muted)] shadow-[var(--shadow-soft)]">
+      <div className="pointer-events-none absolute inset-0 bg-[var(--muted)]" aria-hidden />
       <iframe
         title="Master Touch map"
         src={embedUrl}
-        className="h-80 w-full md:h-[22rem]"
+        className="relative z-[1] h-80 w-full bg-[var(--muted)] md:h-[22rem]"
         loading="lazy"
         referrerPolicy="no-referrer-when-downgrade"
       />
@@ -666,7 +682,9 @@ export function TextBlock({ section }: { section: HomepageSection }) {
           ) : null}
           {section.cta_href && section.cta_label ? (
             <Link href={section.cta_href} className="mt-6 inline-block">
-              <Button variant="outline">{section.cta_label}</Button>
+              <Button variant="outline" size="lg">
+                {section.cta_label}
+              </Button>
             </Link>
           ) : null}
         </div>
@@ -766,7 +784,7 @@ export function ServicesShowcase({
   return (
     <section className="services-engineering section-pad">
       <div className="container-mt">
-        <div className="mb-16 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+        <div className="mb-14 flex flex-col gap-8 md:mb-16 lg:flex-row lg:items-end lg:justify-between">
           <motion.div
             className="max-w-2xl"
             initial={{ opacity: 0, y: 20 }}
@@ -774,7 +792,7 @@ export function ServicesShowcase({
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
           >
-            <p className="eyebrow mb-4">Systems</p>
+            <p className="eyebrow mb-4">{locale === "ar" ? "الأنظمة" : "Systems"}</p>
             <h2 className="font-display text-h2 font-semibold tracking-tight text-[var(--primary)]">
               {section.title}
             </h2>
@@ -786,7 +804,8 @@ export function ServicesShowcase({
           </motion.div>
           <div className="flex flex-wrap items-center gap-4 lg:pb-2">
             <span className="hidden text-[0.65rem] font-semibold tracking-[0.22em] uppercase text-[var(--muted-foreground)] sm:inline">
-              {String(services.length).padStart(2, "0")} disciplines
+              {String(services.length).padStart(2, "0")}{" "}
+              {locale === "ar" ? "تخصصات" : "disciplines"}
             </span>
             {section.cta_href ? (
               <Link href={resolveHref(locale, section.cta_href)}>
@@ -836,7 +855,7 @@ export function Timeline({
               transition={{ delay: i * 0.08, duration: 0.45 }}
               className="grid gap-4 border-t border-[var(--line)] py-10 md:grid-cols-12 md:gap-10 md:py-12"
             >
-              <p className="font-display text-3xl font-semibold tracking-tight text-[var(--accent)] md:col-span-2">
+              <p className="font-display text-2xl font-semibold tracking-tight text-[var(--accent)] md:col-span-2 md:text-3xl">
                 {item.event_year}
               </p>
               <div className="md:col-span-10">
@@ -866,24 +885,25 @@ export function PageHero({
   subtitle?: string | null;
   imageSrc?: string;
 }) {
+  const reduceMotion = useReducedMotion();
   return (
     <section className="page-hero">
       <MediaFill src={imageSrc} priority sizes="100vw" />
       <div className="container-mt">
         <div className="max-w-3xl">
           <motion.h1
-            initial={{ opacity: 0, y: 20 }}
+            initial={reduceMotion ? false : { opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: reduceMotion ? 0 : 0.6 }}
             className="font-display text-h1 font-semibold tracking-tight"
           >
             {title}
           </motion.h1>
           {subtitle ? (
             <motion.p
-              initial={{ opacity: 0, y: 16 }}
+              initial={reduceMotion ? false : { opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.12 }}
+              transition={{ duration: reduceMotion ? 0 : 0.6, delay: reduceMotion ? 0 : 0.12 }}
               className="mt-5 max-w-2xl text-base leading-relaxed text-white/75 md:text-lg"
             >
               {subtitle}

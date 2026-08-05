@@ -3,14 +3,14 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-normal text-sm font-semibold tracking-wide transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)] disabled:pointer-events-none disabled:opacity-50 sm:whitespace-nowrap",
+  "inline-flex items-center justify-center gap-2 whitespace-normal rounded-[var(--radius)] text-sm font-semibold tracking-wide transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)] disabled:pointer-events-none disabled:opacity-50 sm:whitespace-nowrap",
   {
     variants: {
       variant: {
         default:
           "bg-[var(--primary)] text-[var(--primary-foreground)] hover:bg-[color-mix(in_oklab,var(--primary)_88%,white)]",
         accent:
-          "bg-[var(--accent)] text-white shadow-[0_10px_28px_rgba(30,94,255,0.28)] hover:brightness-110 hover:shadow-[0_14px_36px_rgba(30,94,255,0.34)]",
+          "bg-[var(--accent)] text-white shadow-[var(--shadow-cta)] hover:brightness-110 hover:shadow-[var(--shadow-cta-hover)]",
         outline:
           "border border-[var(--line)] bg-transparent text-[var(--foreground)] hover:border-[var(--accent)] hover:text-[var(--accent)]",
         ghost: "text-[var(--foreground)] hover:bg-[var(--muted)]",
