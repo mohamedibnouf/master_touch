@@ -41,7 +41,7 @@ export function LoginForm({
 
   return (
     <form
-      className="mt-panel mx-auto w-full max-w-md space-y-4 border border-[var(--line)] p-5 sm:p-8"
+      className="mt-panel mx-auto w-full max-w-md space-y-5 border border-[var(--line)] bg-[var(--surface)] p-6 shadow-[var(--shadow-soft)] sm:p-9"
       onSubmit={handleSubmit((values) => {
         setError(null);
         startTransition(async () => {
@@ -51,7 +51,7 @@ export function LoginForm({
       })}
       noValidate
     >
-      <h1 className="font-display text-3xl text-[var(--primary)]">{t("login")}</h1>
+      <h1 className="font-display text-3xl font-semibold tracking-tight text-[var(--primary)]">{t("login")}</h1>
       <div>
         <Label htmlFor="login-email">{t("email")}</Label>
         <Input id="login-email" type="email" autoComplete="email" {...register("email")} />
@@ -94,7 +94,7 @@ export function ForgotPasswordForm() {
 
   return (
     <form
-      className="mt-panel mx-auto w-full max-w-md space-y-4 border border-[var(--line)] p-5 sm:p-8"
+      className="mt-panel mx-auto w-full max-w-md space-y-5 border border-[var(--line)] bg-[var(--surface)] p-6 shadow-[var(--shadow-soft)] sm:p-9"
       onSubmit={handleSubmit((values) => {
         startTransition(async () => {
           const res = await forgotPasswordAction(values.email, locale);
@@ -103,7 +103,7 @@ export function ForgotPasswordForm() {
       })}
       noValidate
     >
-      <h1 className="font-display text-3xl text-[var(--primary)]">{t("forgotPassword")}</h1>
+      <h1 className="font-display text-3xl font-semibold tracking-tight text-[var(--primary)]">{t("forgotPassword")}</h1>
       <div>
         <Label htmlFor="forgot-email">{t("email")}</Label>
         <Input id="forgot-email" type="email" autoComplete="email" {...register("email")} />
@@ -129,7 +129,7 @@ export function ResetPasswordForm() {
 
   return (
     <form
-      className="mt-panel mx-auto w-full max-w-md space-y-4 border border-[var(--line)] p-5 sm:p-8"
+      className="mt-panel mx-auto w-full max-w-md space-y-5 border border-[var(--line)] bg-[var(--surface)] p-6 shadow-[var(--shadow-soft)] sm:p-9"
       onSubmit={handleSubmit((values) => {
         if (values.password !== values.confirm) {
           setMessage("mismatch");
@@ -142,7 +142,7 @@ export function ResetPasswordForm() {
       })}
       noValidate
     >
-      <h1 className="font-display text-3xl text-[var(--primary)]">{t("resetPassword")}</h1>
+      <h1 className="font-display text-3xl font-semibold tracking-tight text-[var(--primary)]">{t("resetPassword")}</h1>
       <div>
         <Label htmlFor="new-password">{t("newPassword")}</Label>
         <Input id="new-password" type="password" autoComplete="new-password" {...register("password")} />
