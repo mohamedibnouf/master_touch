@@ -38,7 +38,7 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
       />
       <section className="services-engineering section-pad">
         <div className="container-mt">
-          <div className="mb-14 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div className="mb-16 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-2xl">
               <p className="eyebrow mb-4">Systems</p>
               <h2 className="font-display text-h2 font-semibold tracking-tight text-[var(--primary)]">
@@ -52,7 +52,7 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
               {String(services.length).padStart(2, "0")} disciplines
             </span>
           </div>
-          <div className="grid gap-5 md:grid-cols-2">
+          <div className="grid gap-6 md:grid-cols-2">
             {services.map((service, i) => (
               <ServiceCard
                 key={service.id}

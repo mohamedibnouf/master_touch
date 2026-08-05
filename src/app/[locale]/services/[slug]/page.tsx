@@ -91,26 +91,26 @@ export default async function ServiceDetailPage({
       />
       <section className="section-pad">
         <div className="container-mt">
-          <div className="max-w-3xl">
-          <p className="text-lg leading-relaxed text-[var(--muted-foreground)] md:text-xl">
-            {service.description}
-          </p>
-          <Link href={`/${locale}/contact`} className="mt-10 inline-block">
-            <Button variant="accent" size="lg">
-              {t("requestQuote")}
-              <ArrowUpRight className="h-4 w-4" aria-hidden />
-            </Button>
-          </Link>
+          <div className="max-w-3xl border border-[var(--line)] bg-[var(--surface)] p-8 shadow-[var(--shadow-soft)] md:p-12">
+            <p className="text-lg leading-relaxed text-[var(--muted-foreground)] md:text-xl md:leading-relaxed">
+              {service.description}
+            </p>
+            <Link href={`/${locale}/contact`} className="mt-10 inline-block">
+              <Button variant="accent" size="lg">
+                {t("requestQuote")}
+                <ArrowUpRight className="h-4 w-4" aria-hidden />
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
       {related.length ? (
         <section className="section-pad bg-[var(--muted)]">
           <div className="container-mt">
-            <h2 className="mb-8 font-display text-h2 font-semibold tracking-tight text-[var(--primary)] md:mb-10">
+            <h2 className="mb-10 font-display text-h2 font-semibold tracking-tight text-[var(--primary)] md:mb-12">
               {t("relatedServices")}
             </h2>
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {related.map((s, i) => (
                 <ServiceCard key={s.id} service={s} locale={locale} index={i} />
               ))}
