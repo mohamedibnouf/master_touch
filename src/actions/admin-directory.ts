@@ -165,3 +165,157 @@ export async function getOwnProfileAction() {
     };
   }
 }
+
+export async function inviteAdminUserAction(formData: FormData) {
+  try {
+    const { userId } = await requirePermission("users.manage");
+    const email = String(formData.get("email") ?? "").trim().toLowerCase();
+    const fullName = String(formData.get("full_name") ?? "").trim();
+    const roleId = String(formData.get("role_id") ?? "").trim();
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      throw new ValidationError("A valid email is required");
+    }
+    if (fullName.length < 2 || fullName.length > 120) {
+      throw new ValidationError("full_name must be 2–120 characters");
+    }
+    if (!roleId) throw new ValidationError("role_id is required");
+
+    const admin = createAdminClient();
+    const { data: role, error: roleError } = await admin
+      .from("roles")
+      .select("id, slug, is_system")
+      .eq("id", roleId)
+      .is("deleted_at", null)
+      .maybeSingle();
+    if (roleError) throw new DatabaseError(roleError.message, roleError);
+    if (!role) throw new ValidationError("Role not found");
+
+    const base = (process.env.NEXT_PUBLIC_APP_URL ?? "https://www.mastertouchksa.com").replace(/\/$/, "");
+    const { data: invited, error: inviteError } = await admin.auth.admin.inviteUserByEmail(email, {
+      data: { full_name: fullName },
+      redirectTo: `${base}/ar/login`,
+    });
+    if (inviteError) throw new DatabaseError(inviteError.message, inviteError);
+    const newUserId = invited.user?.id;
+    if (!newUserId) throw new DatabaseError("Invite succeeded but no user id was returned");
+
+    // Profile row is created by handle_new_user trigger; ensure name + role.
+    await admin.from("profiles").update({ full_name: fullName, is_active: true }).eq("id", newUserId);
+    const { error: urError } = await admin.from("user_roles").insert({
+      user_id: newUserId,
+      role_id: roleId,
+      created_by: userId,
+    });
+    if (urError) throw new DatabaseError(urError.message, urError);
+
+    await writeAuditLog("users.invite", "profiles", newUserId, {
+      email,
+      roleId,
+      roleSlug: role.slug,
+    });
+    revalidatePath("/admin/users");
+    return { ok: true as const, data: { userId: newUserId } };
+  } catch (error) {
+    return toActionError(error);
+  }
+}
+
+export async function listPermissionCatalogAction() {
+  try {
+    await requirePermission("roles.view");
+    const admin = createAdminClient();
+    const { data, error } = await admin
+      .from("permissions")
+      .select("id, key, module, action")
+      .is("deleted_at", null)
+      .order("module")
+      .order("key");
+    if (error) throw new DatabaseError(error.message, error);
+    return {
+      ok: true as const,
+      data: (data ?? []).map((p) => ({
+        id: p.id,
+        key: p.key,
+        module: p.module,
+        action: p.action,
+      })),
+    };
+  } catch (error) {
+    return { ...toActionError(error), data: [] as const };
+  }
+}
+
+export async function getRolePermissionKeysAction(roleId: string) {
+  try {
+    await requirePermission("roles.view");
+    if (!roleId) throw new ValidationError("roleId is required");
+    const admin = createAdminClient();
+    const { data, error } = await admin
+      .from("role_permissions")
+      .select("permission_id, permissions(key)")
+      .eq("role_id", roleId);
+    if (error) throw new DatabaseError(error.message, error);
+    const keys: string[] = [];
+    for (const row of data ?? []) {
+      const perm = row.permissions as unknown as { key: string } | null;
+      if (perm?.key) keys.push(perm.key);
+    }
+    return { ok: true as const, data: keys };
+  } catch (error) {
+    return { ...toActionError(error), data: [] as string[] };
+  }
+}
+
+export async function setRolePermissionsAction(formData: FormData) {
+  try {
+    const { userId } = await requirePermission("roles.manage");
+    const roleId = String(formData.get("role_id") ?? "").trim();
+    if (!roleId) throw new ValidationError("role_id is required");
+
+    const keys = formData
+      .getAll("permission_key")
+      .map((v) => String(v).trim())
+      .filter(Boolean);
+
+    const admin = createAdminClient();
+    const { data: role, error: roleError } = await admin
+      .from("roles")
+      .select("id, slug")
+      .eq("id", roleId)
+      .is("deleted_at", null)
+      .maybeSingle();
+    if (roleError) throw new DatabaseError(roleError.message, roleError);
+    if (!role) throw new ValidationError("Role not found");
+
+    const { data: perms, error: permError } = keys.length
+      ? await admin.from("permissions").select("id, key").is("deleted_at", null).in("key", keys)
+      : { data: [] as Array<{ id: string; key: string }>, error: null };
+    if (permError) throw new DatabaseError(permError.message, permError);
+
+    const permissionIds = (perms ?? []).map((p) => p.id);
+
+    const { error: delError } = await admin.from("role_permissions").delete().eq("role_id", roleId);
+    if (delError) throw new DatabaseError(delError.message, delError);
+
+    if (permissionIds.length) {
+      const { error: insError } = await admin.from("role_permissions").insert(
+        permissionIds.map((permission_id) => ({
+          role_id: roleId,
+          permission_id,
+          created_by: userId,
+        })),
+      );
+      if (insError) throw new DatabaseError(insError.message, insError);
+    }
+
+    await writeAuditLog("roles.permissions.update", "roles", roleId, {
+      slug: role.slug,
+      keys,
+    });
+    revalidatePath("/admin/roles");
+    return { ok: true as const };
+  } catch (error) {
+    return toActionError(error);
+  }
+}

@@ -162,6 +162,11 @@
     "darkMode": "الوضع الداكن",
     "lightMode": "الوضع الفاتح",
     "systemMode": "النظام",
-    "themeMode": "وضع الثيم"
+    "themeMode": "وضع الثيم",
+    "assignRole": "تعيين الدور",
+    "sendInvite": "إرسال الدعوة",
+    "inviteSent": "تم إرسال الدعوة بنجاح",
+    "savePermissions": "حفظ الصلاحيات",
+    "superAdminBypassHint": "المشرف الأعلى يتجاوز فحوصات الصلاحيات أثناء التشغيل. تبقى قيم المصفوفة مخزّنة للتوضيح."
   }
 }

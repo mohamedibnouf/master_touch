@@ -162,6 +162,11 @@
     "darkMode": "Dark mode",
     "lightMode": "Light mode",
     "systemMode": "System",
-    "themeMode": "Theme mode"
+    "themeMode": "Theme mode",
+    "assignRole": "Assign role",
+    "sendInvite": "Send invite",
+    "inviteSent": "Invite sent successfully",
+    "savePermissions": "Save permissions",
+    "superAdminBypassHint": "Super Admin bypasses permission checks at runtime. Matrix values are still stored for clarity."
   }
 }
