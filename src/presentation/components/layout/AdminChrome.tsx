@@ -75,7 +75,7 @@ export function AdminSidebar() {
   return (
     <aside className="sticky top-0 hidden h-svh w-64 shrink-0 flex-col border-e border-[var(--border)] bg-[var(--primary)] text-white lg:flex">
       <div className="border-b border-white/10 px-5 py-5">
-        <BrandLogo className="h-11 w-auto max-w-[12rem]" sizes="176px" />
+        <BrandLogo className="h-10 w-auto max-w-[11rem]" sizes="160px" />
         <p className="mt-2 text-xs text-white/60">CMS Admin</p>
       </div>
       <NavLinks />
@@ -148,7 +148,7 @@ export function AdminTopbar() {
           <aside className="absolute inset-y-0 start-0 flex w-[min(18rem,88vw)] flex-col bg-[var(--primary)] text-white shadow-xl">
             <div className="flex items-center justify-between border-b border-white/10 px-4 py-4">
               <div>
-                <BrandLogo className="h-10 w-auto max-w-[11rem]" sizes="160px" />
+                <BrandLogo className="h-9 w-auto max-w-[10rem]" sizes="144px" />
                 <p className="mt-1 text-xs text-white/60">CMS Admin</p>
               </div>
               <button
