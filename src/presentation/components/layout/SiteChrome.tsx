@@ -158,19 +158,22 @@ export function SiteHeader({ brand }: { brand: string }) {
             : "border-b border-transparent bg-gradient-to-b from-[rgba(6,16,28,0.78)] via-[rgba(6,16,28,0.35)] to-transparent",
         )}
       >
-        <div className="container-mt flex h-[var(--header-height)] items-center justify-between gap-3 px-[var(--page-gutter)]">
+        <div className="relative flex h-[var(--header-height)] w-full items-center justify-between gap-3 pe-[var(--page-gutter)] ps-[max(0.35rem,env(safe-area-inset-inline-start,0px))]">
           <Link
             href={`/${locale}`}
-            className="relative flex min-w-0 shrink items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+            className="relative z-[1] flex min-w-0 shrink-0 items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
             aria-label={brand}
           >
             <BrandLogo
               priority
-              className="h-[calc(var(--header-height)-0.35rem)] w-[min(22rem,68vw)] sm:w-[min(26rem,52vw)] lg:w-[30rem] max-w-full"
+              className="h-[calc(var(--header-height)-0.35rem)] w-[min(22rem,68vw)] sm:w-[min(26rem,52vw)] lg:w-[30rem]"
               sizes="(max-width:640px) 280px, (max-width:1024px) 400px, 480px"
             />
           </Link>
-          <nav className="hidden items-center gap-1 lg:flex lg:gap-1" aria-label="Primary">
+          <nav
+            className="absolute left-1/2 top-1/2 z-0 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-1 lg:flex lg:gap-1"
+            aria-label="Primary"
+          >
             {links.map((link) => {
               const active =
                 pathname === link.href ||
@@ -193,7 +196,7 @@ export function SiteHeader({ brand }: { brand: string }) {
               );
             })}
           </nav>
-          <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+          <div className="relative z-[1] flex shrink-0 items-center gap-1 sm:gap-2">
             <ThemeQuickToggle light />
             <LocaleSwitcher />
             <Link
