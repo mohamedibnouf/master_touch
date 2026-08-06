@@ -39,14 +39,15 @@ export default async function LocaleLayout({
   const tagline = site.tagline_i18n[locale] ?? site.tagline_i18n.en ?? "";
   const dir = getDirection(locale);
 
-  // Normalize legacy terracotta / soft-radius CMS theme to current engineering tokens.
+  // Soften legacy sharp corners from CMS theme to the current soft radius.
   const accentRaw = (theme.accent_color ?? "").trim().toLowerCase();
   const accent =
     accentRaw === "#e87722" || accentRaw === "#e36a1a" ? "#1e5eff" : theme.accent_color;
+  const radiusRaw = (theme.border_radius ?? "").trim();
   const radius =
-    theme.border_radius === "0.75rem" || theme.border_radius === "0.5rem"
-      ? "0.125rem"
-      : theme.border_radius;
+    !radiusRaw || radiusRaw === "0" || radiusRaw === "0.125rem" || radiusRaw === "0.5rem"
+      ? "0.75rem"
+      : radiusRaw;
   const background =
     (theme.background_color ?? "").trim().toLowerCase() === "#ffffff"
       ? "#f4f6f9"

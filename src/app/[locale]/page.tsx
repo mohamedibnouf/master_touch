@@ -107,7 +107,17 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       case "contact_map":
         return (
           <section key={section.id} className="section-pad">
-            <div className="container-mt">
+            <div
+              aria-hidden
+              className="section-seam section-seam--top"
+              style={{ ["--seam-color" as string]: "var(--background)" }}
+            />
+            <div
+              aria-hidden
+              className="section-seam section-seam--bottom section-seam--veil"
+              style={{ ["--seam-color" as string]: "var(--background)" }}
+            />
+            <div className="container-mt relative z-[1]">
               <SectionHeading title={section.title} subtitle={section.subtitle} />
               <ContactMap embedUrl={contact.map_embed_url} />
             </div>

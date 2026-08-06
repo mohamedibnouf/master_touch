@@ -103,6 +103,36 @@ function resolveAboutCover(url?: string | null) {
   return url;
 }
 
+/** Soft gradient seams so adjacent sections blend without hard edges. */
+function SectionSeams({
+  top,
+  bottom,
+  veil,
+}: {
+  top?: string;
+  bottom?: string;
+  veil?: boolean;
+}) {
+  return (
+    <>
+      {top ? (
+        <div
+          aria-hidden
+          className="section-seam section-seam--top"
+          style={{ ["--seam-color" as string]: top }}
+        />
+      ) : null}
+      {bottom ? (
+        <div
+          aria-hidden
+          className={cn("section-seam section-seam--bottom", veil && "section-seam--veil")}
+          style={{ ["--seam-color" as string]: bottom }}
+        />
+      ) : null}
+    </>
+  );
+}
+
 function MediaFill({
   src,
   alt = "",
@@ -182,8 +212,12 @@ export function HeroSlider({
         </motion.div>
       </AnimatePresence>
       {/* Softer veil — fades into page background to hide the section seam */}
-      <div className="absolute inset-0 bg-[linear-gradient(115deg,rgba(6,16,28,0.68)_0%,rgba(10,27,51,0.48)_45%,rgba(30,94,255,0.18)_100%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,transparent_52%,color-mix(in_oklab,var(--background)_40%,transparent)_78%,var(--background)_100%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(115deg,rgba(6,16,28,0.62)_0%,rgba(10,27,51,0.42)_45%,rgba(30,94,255,0.16)_100%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,transparent_48%,color-mix(in_oklab,var(--background)_35%,transparent)_72%,color-mix(in_oklab,var(--background)_82%,transparent)_90%,var(--background)_100%)]" />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[clamp(4rem,10vw,7.5rem)] bg-[linear-gradient(to_top,var(--background)_0%,color-mix(in_oklab,var(--background)_50%,transparent)_55%,transparent_100%)]"
+      />
 
       <div className="relative container-mt flex min-h-[100svh] flex-col justify-end px-[var(--page-gutter)] pb-[max(4rem,calc(env(safe-area-inset-bottom,0px)+3rem))] pt-[calc(var(--header-height)+2.5rem+env(safe-area-inset-top,0px))] md:justify-center md:pb-28">
         <motion.p
@@ -319,8 +353,9 @@ export function StatsCounter({
   if (!items.length) return null;
 
   return (
-    <section className="section-pad border-y border-[var(--line)] bg-[var(--surface)]">
-      <div className="container-mt">
+    <section className="section-pad section-tone-surface">
+      <SectionSeams top="var(--background)" bottom="var(--background)" veil />
+      <div className="container-mt relative z-[1]">
         <SectionHeading title={section.title} subtitle={section.subtitle} />
         <div className="grid gap-x-10 gap-y-14 sm:grid-cols-2 lg:grid-cols-4">
           {items.map((item, i) => {
@@ -395,7 +430,8 @@ export function ValuesShowcase({
   const locale = useLocale();
   return (
     <section className="values-blueprint section-pad">
-      <div className="container-mt">
+      <SectionSeams top="var(--background)" bottom="var(--background)" veil />
+      <div className="container-mt relative z-[1]">
         <div className="mb-14 flex flex-col gap-8 md:mb-16 lg:flex-row lg:items-end lg:justify-between">
           <motion.div
             className="max-w-2xl"
@@ -422,7 +458,7 @@ export function ValuesShowcase({
             className="hidden items-center gap-3 pb-2 text-[0.65rem] font-semibold tracking-[0.22em] uppercase text-[var(--muted-foreground)] sm:flex"
             aria-hidden
           >
-            <span className="inline-block h-8 w-8 border border-[var(--line)]" />
+            <span className="inline-block h-8 w-8 rounded-[var(--radius)] border border-[var(--line)]" />
             <span>
               {String(items.length).padStart(2, "0")}{" "}
               {locale === "ar" ? "وحدات" : "modules"}
@@ -564,7 +600,7 @@ export function ServiceCard({
             <span className="min-w-0 text-[0.65rem] font-semibold tracking-[0.2em] uppercase text-[var(--primary)]/55 transition group-hover:text-[var(--accent)] rtl:tracking-normal">
               {locale === "ar" ? "استكشف الخدمة" : "Explore system"}
             </span>
-            <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center border border-[var(--line)] text-[var(--primary)] transition group-hover:border-[var(--accent)] group-hover:bg-[var(--accent)] group-hover:text-white">
+            <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-[var(--radius)] border border-[var(--line)] text-[var(--primary)] transition group-hover:border-[var(--accent)] group-hover:bg-[var(--accent)] group-hover:text-white">
               <ArrowUpRight className="h-4 w-4" aria-hidden />
             </span>
           </div>
@@ -591,12 +627,13 @@ export function CtaBanner({ section, locale }: { section: HomepageSection; local
   const reduceMotion = useReducedMotion();
   return (
     <section className="section-pad">
+      <SectionSeams top="var(--background)" bottom="var(--background)" />
       <motion.div
         initial={reduceMotion ? false : { opacity: 0, y: 24 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: reduceMotion ? 0 : 0.6 }}
-        className="cta-engineering container-mt"
+        className="cta-engineering container-mt relative z-[1]"
       >
         <div className="cta-engineering__grid" aria-hidden />
         <div className="cta-engineering__beam" aria-hidden />
@@ -639,7 +676,7 @@ export function CtaBanner({ section, locale }: { section: HomepageSection; local
           </div>
 
           <div className="hidden min-w-0 lg:col-span-4 lg:block">
-            <div className="ms-auto max-w-[15rem] border border-white/15 bg-white/[0.04] p-6 backdrop-blur-[2px]">
+            <div className="ms-auto max-w-[15rem] rounded-[var(--radius)] border border-white/15 bg-white/[0.04] p-6 backdrop-blur-[2px]">
               <p className="font-display text-[0.65rem] tracking-[0.2em] text-[var(--accent)]">SPEC</p>
               <p className="mt-4 text-sm leading-relaxed text-white/70">
                 {locale === "ar"
@@ -661,7 +698,8 @@ export function CtaBanner({ section, locale }: { section: HomepageSection; local
 export function TextBlock({ section }: { section: HomepageSection }) {
   return (
     <section className="section-pad">
-      <div className="container-mt">
+      <SectionSeams bottom="var(--background)" />
+      <div className="container-mt relative z-[1]">
         <div className="max-w-3xl">
           <SectionHeading title={section.title} subtitle={section.subtitle} />
           {section.body ? (
@@ -688,8 +726,9 @@ export function VisionMissionPair({
   mission: HomepageSection;
 }) {
   return (
-    <section className="section-pad bg-[var(--muted)]">
-      <div className="container-mt grid gap-6 md:grid-cols-2">
+    <section className="section-pad section-tone-muted">
+      <SectionSeams top="var(--background)" bottom="var(--background)" veil />
+      <div className="container-mt relative z-[1] grid gap-6 md:grid-cols-2">
         {[vision, mission].map((block, i) => (
           <motion.div
             key={block.id}
@@ -697,7 +736,7 @@ export function VisionMissionPair({
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: i * 0.1, duration: 0.5 }}
-            className="border border-[var(--line)] bg-[var(--surface)] p-8 shadow-[var(--shadow-soft)] md:p-12"
+            className="rounded-[var(--radius)] border border-[var(--line)] bg-[var(--surface)] p-8 shadow-[var(--shadow-soft)] md:p-12"
           >
             <p className="eyebrow mb-5">{block.title}</p>
             <p className="text-lg leading-relaxed text-[var(--muted-foreground)] md:text-xl">
@@ -721,7 +760,8 @@ export function AboutIntro({
 }) {
   return (
     <section className="section-pad">
-      <div className="container-mt grid items-center gap-14 lg:grid-cols-12 lg:gap-16">
+      <SectionSeams top="var(--background)" bottom="var(--background)" veil />
+      <div className="container-mt relative z-[1] grid items-center gap-14 lg:grid-cols-12 lg:gap-16">
         <motion.div
           className="lg:col-span-6"
           initial={{ opacity: 0, y: 24 }}
@@ -771,7 +811,8 @@ export function ServicesShowcase({
 }) {
   return (
     <section className="services-engineering section-pad">
-      <div className="container-mt">
+      <SectionSeams top="var(--background)" bottom="var(--background)" veil />
+      <div className="container-mt relative z-[1]">
         <div className="mb-14 flex flex-col gap-8 md:mb-16 lg:flex-row lg:items-end lg:justify-between">
           <motion.div
             className="max-w-2xl"
@@ -831,7 +872,8 @@ export function Timeline({
 }) {
   return (
     <section className="section-pad">
-      <div className="container-mt">
+      <SectionSeams top="var(--background)" bottom="var(--background)" />
+      <div className="container-mt relative z-[1]">
         <SectionHeading title={title} />
         <ol className="relative space-y-0">
           {items.map((item, i) => (

@@ -19,7 +19,7 @@ export const previewThemeSettings: ThemeSettings = {
   foreground_color: "#0a1628",
   font_sans: "Source Sans 3",
   font_display: "Outfit",
-  border_radius: "0.125rem",
+  border_radius: "0.75rem",
   button_style: {},
   card_style: {},
   animation_settings: {},

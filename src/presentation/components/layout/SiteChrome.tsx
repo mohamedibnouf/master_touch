@@ -158,16 +158,16 @@ export function SiteHeader({ brand }: { brand: string }) {
             : "border-b border-transparent bg-gradient-to-b from-[rgba(6,16,28,0.78)] via-[rgba(6,16,28,0.35)] to-transparent",
         )}
       >
-        <div className="relative flex h-[var(--header-height)] w-full items-center justify-between gap-3 pe-[var(--page-gutter)] ps-[max(0.35rem,env(safe-area-inset-inline-start,0px))]">
+        <div className="relative h-[var(--header-height)] w-full">
           <Link
             href={`/${locale}`}
-            className="relative z-[1] flex min-w-0 shrink-0 items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+            className="absolute start-0 top-1/2 z-[1] flex -translate-y-1/2 items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
             aria-label={brand}
           >
             <BrandLogo
               priority
-              className="h-[calc(var(--header-height)-0.35rem)] w-[min(22rem,68vw)] sm:w-[min(26rem,52vw)] lg:w-[30rem]"
-              sizes="(max-width:640px) 280px, (max-width:1024px) 400px, 480px"
+              className="h-[calc(var(--header-height)-0.15rem)] w-auto max-w-[min(92vw,34rem)]"
+              sizes="(max-width:640px) 280px, (max-width:1024px) 420px, 544px"
             />
           </Link>
           <nav
@@ -196,7 +196,7 @@ export function SiteHeader({ brand }: { brand: string }) {
               );
             })}
           </nav>
-          <div className="relative z-[1] flex shrink-0 items-center gap-1 sm:gap-2">
+          <div className="absolute end-0 top-1/2 z-[1] flex -translate-y-1/2 items-center gap-1 pe-[var(--page-gutter)] sm:gap-2">
             <ThemeQuickToggle light />
             <LocaleSwitcher />
             <Link
@@ -297,7 +297,7 @@ export function SiteFooter({
               className="mt-5 inline-flex focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
               aria-label={brand}
             >
-              <BrandLogo className="h-20 w-[18rem] max-w-full sm:h-24 sm:w-[22rem] lg:h-28 lg:w-[28rem]" sizes="448px" />
+              <BrandLogo className="h-20 w-auto max-w-[min(92vw,28rem)] sm:h-24 lg:h-28" sizes="448px" />
             </Link>
             <p className="mt-6 max-w-md text-sm leading-relaxed text-white/65">
               {tagline || t("tagline")}
