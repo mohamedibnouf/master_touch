@@ -1,7 +1,8 @@
 import { setRequestLocale } from "next-intl/server";
 import type { Locale } from "@/lib/i18n/config";
 import { getContactContent, getPageSeo } from "@/infrastructure/repositories/content.repository";
-import { ContactMap, PageHero } from "@/presentation/components/marketing/sections";
+import { PageHero } from "@/presentation/components/marketing/sections";
+import { ContactMap } from "@/presentation/components/marketing/ContactMap";
 import { ContactForm } from "@/presentation/features/contact/ContactForm";
 import { Mail, Phone, Globe } from "lucide-react";
 import { buildPageMetadata } from "@/lib/seo/metadata";

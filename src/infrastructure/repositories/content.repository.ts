@@ -599,6 +599,9 @@ export async function getPageSeo(slug: string, locale: AppLocale): Promise<PageS
     og_title: seo.og_title,
     og_description: seo.og_description,
     og_image_url: seo.og_image_url,
+    twitter_title: seo.twitter_title ?? null,
+    twitter_description: seo.twitter_description ?? null,
+    twitter_image_url: seo.twitter_image_url ?? null,
     canonical_url: seo.canonical_url,
     robots: seo.robots,
   };

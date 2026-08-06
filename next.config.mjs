@@ -32,7 +32,42 @@ const nextConfig = {
           key: "Permissions-Policy",
           value: "camera=(), microphone=(), geolocation=()",
         },
+        {
+          key: "Strict-Transport-Security",
+          value: "max-age=63072000; includeSubDomains; preload",
+        },
+        { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+        {
+          key: "Content-Security-Policy",
+          value: [
+            "default-src 'self'",
+            "base-uri 'self'",
+            "form-action 'self'",
+            "frame-ancestors 'none'",
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+            "style-src 'self' 'unsafe-inline'",
+            "img-src 'self' data: blob: https://*.supabase.co https://www.mastertouchksa.com",
+            "font-src 'self' data:",
+            "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.upstash.io",
+            "frame-src 'self' https://www.google.com https://maps.google.com https://*.google.com",
+            "object-src 'none'",
+            "upgrade-insecure-requests",
+          ].join("; "),
+        },
       ],
+    },
+    {
+      source: "/images/:path*",
+      headers: [
+        {
+          key: "Cache-Control",
+          value: "public, max-age=86400, stale-while-revalidate=604800",
+        },
+      ],
+    },
+    {
+      source: "/api/health",
+      headers: [{ key: "Cache-Control", value: "no-store" }],
     },
   ],
 };

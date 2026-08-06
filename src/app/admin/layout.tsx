@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { redirect } from "next/navigation";
 import { AdminSidebar, AdminTopbar } from "@/presentation/components/layout/AdminChrome";
@@ -6,6 +7,11 @@ import { requireAdminAccess } from "@/lib/permissions";
 import { AuthorizationError, AuthenticationError } from "@/domain/shared/errors";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Admin",
+  robots: { index: false, follow: false, googleBot: { index: false, follow: false } },
+};
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   try {

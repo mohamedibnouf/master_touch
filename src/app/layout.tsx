@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Outfit, Source_Sans_3 } from "next/font/google";
+import { getLocale } from "next-intl/server";
 import { ThemeProvider } from "@/presentation/components/shared/ThemeProvider";
 import { THEME_BOOTSTRAP_SCRIPT } from "@/presentation/components/shared/theme-bootstrap";
 import "./globals.css";
@@ -25,9 +26,12 @@ export const metadata: Metadata = {
     "Electromechanical works, architectural finishing, and smart solutions in Saudi Arabia.",
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "https://www.mastertouchksa.com"),
   icons: {
-    icon: [{ url: "/images/logo-master-touch.png", type: "image/png" }],
-    apple: [{ url: "/images/logo-master-touch.png" }],
-    shortcut: ["/images/logo-master-touch.png"],
+    icon: [
+      { url: "/icon.png", type: "image/png" },
+      { url: "/images/logo-master-touch.png", type: "image/png" },
+    ],
+    apple: [{ url: "/apple-icon.png" }],
+    shortcut: ["/icon.png"],
   },
 };
 
@@ -37,9 +41,16 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  let lang = "ar";
+  try {
+    lang = await getLocale();
+  } catch {
+    lang = "ar";
+  }
+
   return (
-    <html lang="ar" suppressHydrationWarning>
+    <html lang={lang} suppressHydrationWarning>
       <head>
         <script
           id="mt-theme-bootstrap"

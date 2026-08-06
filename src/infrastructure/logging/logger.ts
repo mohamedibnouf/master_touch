@@ -4,6 +4,37 @@ type LogContext = Record<string, unknown>;
 
 const isProd = process.env.NODE_ENV === "production";
 
+const SENSITIVE_KEY =
+  /pass(word)?|secret|token|authorization|cookie|service[_-]?role|private[_-]?key/i;
+
+function sanitizeContext(context?: LogContext): LogContext | undefined {
+  if (!context) return undefined;
+  const out: LogContext = {};
+  for (const [key, value] of Object.entries(context)) {
+    if (SENSITIVE_KEY.test(key)) {
+      out[key] = "[redacted]";
+      continue;
+    }
+    if (key === "error") {
+      out.error = safeError(value);
+      continue;
+    }
+    out[key] = value;
+  }
+  return out;
+}
+
+export function safeError(err: unknown): { name?: string; message: string; code?: string } {
+  if (err && typeof err === "object" && "code" in err && "message" in err) {
+    const e = err as { name?: string; message: string; code?: string };
+    return { name: e.name, message: e.message, code: e.code };
+  }
+  if (err instanceof Error) {
+    return { name: err.name, message: err.message };
+  }
+  return { message: String(err) };
+}
+
 function write(level: LogLevel, message: string, context?: LogContext) {
   const entry = {
     ts: new Date().toISOString(),
@@ -11,7 +42,7 @@ function write(level: LogLevel, message: string, context?: LogContext) {
     message,
     service: "master-touch",
     env: process.env.NODE_ENV ?? "development",
-    ...context,
+    ...sanitizeContext(context),
   };
 
   const line = JSON.stringify(entry);
@@ -26,10 +57,9 @@ function write(level: LogLevel, message: string, context?: LogContext) {
     console.info(line);
   }
 
-  // Hook: forward to Sentry / OTel when configured
   if (level === "error" && process.env.SENTRY_DSN) {
     void import("@/infrastructure/monitoring/sentry")
-      .then((m) => m.captureException(context?.error ?? message, context))
+      .then((m) => m.captureException(safeError(context?.error ?? message), sanitizeContext(context)))
       .catch(() => undefined);
   }
 }

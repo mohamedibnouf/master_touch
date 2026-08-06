@@ -8,7 +8,6 @@ import {
 } from "@/infrastructure/repositories/content.repository";
 import {
   AboutIntro,
-  ContactMap,
   CtaBanner,
   HeroSlider,
   SectionHeading,
@@ -18,6 +17,7 @@ import {
   ValuesGrid,
   VisionMissionPair,
 } from "@/presentation/components/marketing/sections";
+import { ContactMap } from "@/presentation/components/marketing/ContactMap";
 import type { Locale } from "@/lib/i18n/config";
 import type { Metadata } from "next";
 import { buildPageMetadata } from "@/lib/seo/metadata";

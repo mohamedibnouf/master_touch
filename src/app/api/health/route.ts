@@ -1,5 +1,3 @@
-import { existsSync, readFileSync } from "fs";
-import { join } from "path";
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { Redis } from "@upstash/redis";
@@ -9,45 +7,13 @@ export const dynamic = "force-dynamic";
 
 type CheckStatus = "ok" | "fail" | "skip";
 
-function readBuildId(): string {
-  const candidates = [
-    join(process.cwd(), ".next", "BUILD_ID"),
-    join(process.cwd(), "BUILD_ID"),
-  ];
-  for (const file of candidates) {
-    try {
-      if (existsSync(file)) {
-        return readFileSync(file, "utf8").trim();
-      }
-    } catch {
-      /* ignore */
-    }
-  }
-  return process.env.NEXT_BUILD_ID?.trim() || "unknown";
-}
-
-function readAppVersion(): string {
-  try {
-    const pkgPath = join(process.cwd(), "package.json");
-    if (existsSync(pkgPath)) {
-      const pkg = JSON.parse(readFileSync(pkgPath, "utf8")) as { version?: string };
-      if (pkg.version) return pkg.version;
-    }
-  } catch {
-    /* ignore */
-  }
-  return process.env.npm_package_version ?? "0.1.0";
-}
-
 export async function GET() {
   const checks: {
     database: CheckStatus;
     redis: CheckStatus;
-    sentry: CheckStatus;
   } = {
     database: "fail",
     redis: "fail",
-    sentry: process.env.SENTRY_DSN?.trim() ? "ok" : "skip",
   };
 
   if (isSupabaseConfigured()) {
@@ -72,40 +38,22 @@ export async function GET() {
     } catch {
       checks.redis = "fail";
     }
+  } else {
+    checks.redis = "skip";
   }
 
-  const healthy = checks.database === "ok" && checks.redis === "ok";
-  const version = readAppVersion();
-  const buildId = readBuildId();
-  const uptime = Math.round(process.uptime());
+  const healthy =
+    checks.database === "ok" && (checks.redis === "ok" || checks.redis === "skip");
 
   return NextResponse.json(
     {
       status: healthy ? "healthy" : "degraded",
       timestamp: new Date().toISOString(),
-      uptime,
-      uptimeHuman: `${uptime}s`,
-      version,
-      build: {
-        version,
-        id: buildId,
-      },
-      environment: {
-        nodeEnv: process.env.NODE_ENV ?? "unknown",
-        node: process.version,
-        hostname: process.env.HOSTNAME ?? "0.0.0.0",
-        port: process.env.PORT ?? "3000",
-      },
-      checks: {
-        database: checks.database,
-        redis: checks.redis,
-        sentry: checks.sentry,
-        supabase: checks.database,
-        upstash: checks.redis,
-      },
-      database: checks.database,
-      redis: checks.redis,
+      checks,
     },
-    { status: healthy ? 200 : 503 },
+    {
+      status: healthy ? 200 : 503,
+      headers: { "Cache-Control": "no-store" },
+    },
   );
 }

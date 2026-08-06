@@ -105,11 +105,13 @@ function resolveAboutCover(url?: string | null) {
 
 function MediaFill({
   src,
+  alt = "",
   priority,
   sizes,
   className,
 }: {
   src: string;
+  alt?: string;
   priority?: boolean;
   sizes: string;
   className?: string;
@@ -118,7 +120,7 @@ function MediaFill({
   return (
     <Image
       src={src}
-      alt=""
+      alt={alt}
       fill
       priority={priority}
       sizes={sizes}
@@ -522,6 +524,7 @@ export function ServiceCard({
           {cover ? (
             <MediaFill
               src={cover}
+              alt={service.title}
               sizes={
                 featured
                   ? "(max-width:768px) 100vw, 50vw"
@@ -655,22 +658,6 @@ export function CtaBanner({ section, locale }: { section: HomepageSection; local
   );
 }
 
-export function ContactMap({ embedUrl }: { embedUrl: string | null }) {
-  if (!embedUrl) return null;
-  return (
-    <div className="relative overflow-hidden rounded-[var(--radius)] border border-[var(--line)] bg-[var(--muted)] shadow-[var(--shadow-soft)]">
-      <div className="pointer-events-none absolute inset-0 bg-[var(--muted)]" aria-hidden />
-      <iframe
-        title="Master Touch map"
-        src={embedUrl}
-        className="relative z-[1] h-80 w-full bg-[var(--muted)] md:h-[22rem]"
-        loading="lazy"
-        referrerPolicy="no-referrer-when-downgrade"
-      />
-    </div>
-  );
-}
-
 export function TextBlock({ section }: { section: HomepageSection }) {
   return (
     <section className="section-pad">
@@ -764,6 +751,7 @@ export function AboutIntro({
         >
           <MediaFill
             src={resolveAboutCover(coverUrl)}
+            alt={section.title ?? "Master Touch"}
             sizes="(max-width:1024px) 100vw, 50vw"
           />
         </motion.div>
@@ -888,7 +876,7 @@ export function PageHero({
   const reduceMotion = useReducedMotion();
   return (
     <section className="page-hero">
-      <MediaFill src={imageSrc} priority sizes="100vw" />
+      <MediaFill src={imageSrc} alt="" priority sizes="100vw" />
       <div className="container-mt">
         <div className="max-w-3xl">
           <motion.h1
