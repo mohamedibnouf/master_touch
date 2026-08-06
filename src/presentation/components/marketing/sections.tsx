@@ -181,9 +181,9 @@ export function HeroSlider({
           />
         </motion.div>
       </AnimatePresence>
-      {/* Premium dark engineering veil — hero-only gradient */}
-      <div className="absolute inset-0 bg-[linear-gradient(115deg,rgba(6,16,28,0.88)_0%,rgba(10,27,51,0.72)_42%,rgba(30,94,255,0.28)_100%)]" />
-      <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(6,16,28,0.75)_0%,transparent_45%)]" />
+      {/* Softer veil — fades into page background to hide the section seam */}
+      <div className="absolute inset-0 bg-[linear-gradient(115deg,rgba(6,16,28,0.68)_0%,rgba(10,27,51,0.48)_45%,rgba(30,94,255,0.18)_100%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,transparent_52%,color-mix(in_oklab,var(--background)_40%,transparent)_78%,var(--background)_100%)]" />
 
       <div className="relative container-mt flex min-h-[100svh] flex-col justify-end px-[var(--page-gutter)] pb-[max(4rem,calc(env(safe-area-inset-bottom,0px)+3rem))] pt-[calc(var(--header-height)+2.5rem+env(safe-area-inset-top,0px))] md:justify-center md:pb-28">
         <motion.p
