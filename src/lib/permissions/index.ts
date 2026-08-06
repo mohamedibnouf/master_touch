@@ -37,7 +37,7 @@ export async function getCurrentUserPermissions(): Promise<string[]> {
 
   const { data: roles, error: rolesError } = await supabase
     .from("user_roles")
-    .select("role_id, roles(role_permissions(permissions(key)))")
+    .select("role_id, roles(slug, role_permissions(permissions(key)))")
     .eq("user_id", user.id);
 
   if (rolesError) throw new DatabaseError(rolesError.message, rolesError);
@@ -45,8 +45,12 @@ export async function getCurrentUserPermissions(): Promise<string[]> {
   const set = new Set<string>();
   for (const row of roles ?? []) {
     const role = row.roles as unknown as {
+      slug?: string;
       role_permissions: Array<{ permissions: { key: string } | null }>;
     } | null;
+    if (role?.slug === "super_admin") {
+      return ["*"];
+    }
     for (const rp of role?.role_permissions ?? []) {
       if (rp.permissions?.key) set.add(rp.permissions.key);
     }

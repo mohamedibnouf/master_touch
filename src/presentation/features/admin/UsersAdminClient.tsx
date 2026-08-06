@@ -31,10 +31,12 @@ export function UsersAdminClient({
   users,
   roles,
   canManage,
+  listError = null,
 }: {
   users: AdminUser[];
   roles: AdminRole[];
   canManage: boolean;
+  listError?: string | null;
 }) {
   const t = useTranslations("admin");
   const common = useTranslations("common");
@@ -43,34 +45,35 @@ export function UsersAdminClient({
   const [success, setSuccess] = useState(false);
   const [pending, startTransition] = useTransition();
 
-  const assignableRoles = useMemo(
-    () => roles.filter((r) => r.slug !== "super_admin"),
-    [roles],
-  );
+  const assignableRoles = useMemo(() => {
+    const withoutSuper = roles.filter((r) => r.slug !== "super_admin");
+    return withoutSuper.length > 0 ? withoutSuper : roles;
+  }, [roles]);
 
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-display text-3xl text-[var(--primary)]">{t("users")}</h1>
-        <Button
-          variant="accent"
-          type="button"
-          disabled={!canManage}
-          title={canManage ? undefined : "Requires users.manage permission"}
-          onClick={() => {
-            setError(null);
-            setSuccess(false);
-            setOpen(true);
-          }}
-        >
-          {t("inviteUser")}
-        </Button>
+        {canManage ? (
+          <Button
+            variant="accent"
+            type="button"
+            onClick={() => {
+              setError(null);
+              setSuccess(false);
+              setOpen(true);
+            }}
+          >
+            {t("inviteUser")}
+          </Button>
+        ) : null}
       </div>
 
       {success ? <SuccessBanner message={t("inviteSent")} /> : null}
+      {listError ? <ErrorState title={common("error")} description={listError} /> : null}
       {error && !open ? <ErrorState title={common("error")} description={error} /> : null}
 
-      {!users.length ? <EmptyState title={t("noUsers")} /> : null}
+      {!users.length && !listError ? <EmptyState title={t("noUsers")} /> : null}
       <div className="space-y-3">
         {users.map((u) => (
           <Card key={u.id} className="flex flex-wrap items-center justify-between gap-3">
@@ -93,12 +96,17 @@ export function UsersAdminClient({
       </div>
 
       <AdminModal open={open} title={t("inviteUser")} onClose={() => setOpen(false)}>
-        {error ? <ErrorState title={common("error")} description={error} /> : null}
+        {error ? (
+          <div className="mb-4">
+            <ErrorState title={common("error")} description={error} />
+          </div>
+        ) : null}
         <form
-          className="mt-4 space-y-4"
+          className="space-y-4"
           onSubmit={(e) => {
             e.preventDefault();
-            const fd = new FormData(e.currentTarget);
+            const form = e.currentTarget;
+            const fd = new FormData(form);
             setError(null);
             setSuccess(false);
             startTransition(async () => {
@@ -106,6 +114,7 @@ export function UsersAdminClient({
               if (res.ok) {
                 setSuccess(true);
                 setOpen(false);
+                form.reset();
               } else {
                 setError(res.error);
               }
@@ -114,7 +123,14 @@ export function UsersAdminClient({
         >
           <div>
             <Label htmlFor="invite-email">{common("email")}</Label>
-            <Input id="invite-email" name="email" type="email" required autoComplete="email" />
+            <Input
+              id="invite-email"
+              name="email"
+              type="email"
+              required
+              autoComplete="email"
+              placeholder="user@example.com"
+            />
           </div>
           <div>
             <Label htmlFor="invite-name">{t("fullName")}</Label>
@@ -129,18 +145,24 @@ export function UsersAdminClient({
               className="flex h-11 w-full rounded-[var(--radius)] border border-[var(--line)] bg-white px-3 text-sm dark:bg-[var(--surface)]"
               defaultValue={assignableRoles[0]?.id ?? ""}
             >
-              {assignableRoles.map((role) => (
-                <option key={role.id} value={role.id}>
-                  {role.name} ({role.slug})
+              {assignableRoles.length === 0 ? (
+                <option value="" disabled>
+                  No roles available
                 </option>
-              ))}
+              ) : (
+                assignableRoles.map((role) => (
+                  <option key={role.id} value={role.id}>
+                    {role.name} ({role.slug})
+                  </option>
+                ))
+              )}
             </select>
           </div>
           <div className="flex justify-end gap-2 pt-2">
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+            <Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={pending}>
               {t("cancel")}
             </Button>
-            <Button type="submit" variant="accent" disabled={pending || !assignableRoles.length}>
+            <Button type="submit" variant="accent" disabled={pending || assignableRoles.length === 0}>
               {pending ? common("loading") : t("sendInvite")}
             </Button>
           </div>
