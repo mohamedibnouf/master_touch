@@ -166,8 +166,8 @@ export function SiteHeader({ brand }: { brand: string }) {
           >
             <BrandLogo
               priority
-              className="h-[calc(var(--header-height)-0.15rem)] w-auto max-w-[min(92vw,34rem)]"
-              sizes="(max-width:640px) 280px, (max-width:1024px) 420px, 544px"
+              className="h-10 w-auto max-w-[min(70vw,11rem)] sm:h-11 sm:max-w-[13rem] lg:h-12 lg:max-w-[14.5rem]"
+              sizes="(max-width:640px) 160px, (max-width:1024px) 200px, 232px"
             />
           </Link>
           <nav
@@ -297,7 +297,7 @@ export function SiteFooter({
               className="mt-5 inline-flex focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
               aria-label={brand}
             >
-              <BrandLogo className="h-20 w-auto max-w-[min(92vw,28rem)] sm:h-24 lg:h-28" sizes="448px" />
+              <BrandLogo className="h-12 w-auto max-w-[min(80vw,14rem)] sm:h-14 sm:max-w-[16rem]" sizes="224px" />
             </Link>
             <p className="mt-6 max-w-md text-sm leading-relaxed text-white/65">
               {tagline || t("tagline")}
