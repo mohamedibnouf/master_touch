@@ -106,6 +106,7 @@ export function ForgotPasswordForm() {
   const common = useTranslations("common");
   const locale = useLocale();
   const [done, setDone] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const { register, handleSubmit } = useForm<{ email: string }>();
 
@@ -113,9 +114,12 @@ export function ForgotPasswordForm() {
     <form
       className="mt-panel mx-auto w-full max-w-md space-y-5 rounded-[var(--radius)] p-6 shadow-[var(--shadow-soft)] sm:p-9"
       onSubmit={handleSubmit((values) => {
+        setError(null);
+        setDone(false);
         startTransition(async () => {
           const res = await forgotPasswordAction(values.email, locale);
           if (res && "ok" in res && res.ok) setDone(true);
+          else if (res && "ok" in res && res.ok === false) setError(res.error);
         });
       })}
       noValidate
@@ -126,6 +130,11 @@ export function ForgotPasswordForm() {
         <Input id="forgot-email" type="email" autoComplete="email" {...register("email")} />
       </div>
       {done ? <AuthSuccess message={t("resetSent")} /> : null}
+      {error ? (
+        <p className="text-sm text-[var(--warning)]" role="alert">
+          {error}
+        </p>
+      ) : null}
       <Button type="submit" variant="accent" className="w-full" disabled={pending}>
         {pending ? common("loading") : t("sendResetLink")}
       </Button>
@@ -141,6 +150,7 @@ export function ResetPasswordForm() {
   const common = useTranslations("common");
   const locale = useLocale();
   const [message, setMessage] = useState<"ok" | "mismatch" | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const { register, handleSubmit } = useForm<{ password: string; confirm: string }>();
 
@@ -150,11 +160,15 @@ export function ResetPasswordForm() {
       onSubmit={handleSubmit((values) => {
         if (values.password !== values.confirm) {
           setMessage("mismatch");
+          setError(null);
           return;
         }
+        setMessage(null);
+        setError(null);
         startTransition(async () => {
           const res = await resetPasswordAction(values.password);
           if (res && "ok" in res && res.ok) setMessage("ok");
+          else if (res && "ok" in res && res.ok === false) setError(res.error);
         });
       })}
       noValidate
@@ -177,6 +191,11 @@ export function ResetPasswordForm() {
       {message === "mismatch" ? (
         <p className="text-sm text-[var(--warning)]" role="alert">
           {common("passwordMismatch")}
+        </p>
+      ) : null}
+      {error ? (
+        <p className="text-sm text-[var(--warning)]" role="alert">
+          {error}
         </p>
       ) : null}
       <Button type="submit" variant="accent" className="w-full" disabled={pending}>

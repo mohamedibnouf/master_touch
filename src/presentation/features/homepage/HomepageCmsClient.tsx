@@ -1,12 +1,21 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Input } from "@/presentation/components/ui/input";
 import { Label, Textarea, Switch, Card } from "@/presentation/components/ui/primitives";
 import { updateHomepageSectionAction } from "@/actions/cms";
 import type { HomepageSection } from "@/types/cms";
 import { SuccessBanner, EmptyState } from "@/presentation/components/admin/AsyncStates";
+
+function buildEnabledMap(sectionsAr: HomepageSection[], sectionsEn: HomepageSection[]) {
+  const next: Record<string, boolean> = {};
+  for (const section of [...sectionsAr, ...sectionsEn]) {
+    next[section.id] = section.is_enabled;
+  }
+  return next;
+}
 
 export function HomepageCmsClient({
   sectionsAr,
@@ -17,16 +26,43 @@ export function HomepageCmsClient({
 }) {
   const t = useTranslations("admin");
   const common = useTranslations("common");
+  const router = useRouter();
   const [tab, setTab] = useState<"ar" | "en">("ar");
   const [pending, startTransition] = useTransition();
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [enabledById, setEnabledById] = useState(() => buildEnabledMap(sectionsAr, sectionsEn));
 
-  const sections = tab === "ar" ? sectionsAr : sectionsEn;
+  const source = tab === "ar" ? sectionsAr : sectionsEn;
+
+  const sections = useMemo(
+    () =>
+      source.map((section) => ({
+        ...section,
+        is_enabled: enabledById[section.id] ?? section.is_enabled,
+      })),
+    [source, enabledById],
+  );
 
   const persist = (payload: Parameters<typeof updateHomepageSectionAction>[0]) => {
+    setError(null);
     startTransition(async () => {
       const res = await updateHomepageSectionAction(payload);
-      if (res.ok) setSaved(true);
+      if (res.ok) {
+        setSaved(true);
+        if (payload.is_enabled !== undefined) {
+          setEnabledById((prev) => ({ ...prev, [payload.id]: payload.is_enabled! }));
+        }
+        router.refresh();
+      } else {
+        setError(res.error);
+        if (payload.is_enabled !== undefined) {
+          setEnabledById((prev) => ({
+            ...prev,
+            [payload.id]: !payload.is_enabled!,
+          }));
+        }
+      }
     });
   };
 
@@ -53,6 +89,11 @@ export function HomepageCmsClient({
       </div>
 
       {saved ? <SuccessBanner message={common("saved")} /> : null}
+      {error ? (
+        <p className="text-sm text-[var(--warning)]" role="alert">
+          {error}
+        </p>
+      ) : null}
       {!sections.length ? <EmptyState title={common("empty")} /> : null}
 
       <div className="space-y-4">
@@ -69,7 +110,10 @@ export function HomepageCmsClient({
                 <span className="text-xs">{section.is_enabled ? t("enabled") : t("disabled")}</span>
                 <Switch
                   checked={section.is_enabled}
-                  onCheckedChange={(v) => persist({ id: section.id, is_enabled: v })}
+                  onCheckedChange={(v) => {
+                    setEnabledById((prev) => ({ ...prev, [section.id]: v }));
+                    persist({ id: section.id, is_enabled: v });
+                  }}
                 />
               </div>
             </div>

@@ -25,6 +25,7 @@ export function ContactForm({ successMessage }: { successMessage: string }) {
   const t = useTranslations("common");
   const locale = useLocale();
   const [done, setDone] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const {
     register,
@@ -34,11 +35,14 @@ export function ContactForm({ successMessage }: { successMessage: string }) {
   } = useForm<FormValues>({ resolver: zodResolver(schema) });
 
   const onSubmit = (values: FormValues) => {
+    setSubmitError(null);
     startTransition(async () => {
       const result = await submitContactMessage(values);
       if (result.ok) {
         setDone(true);
         reset();
+      } else {
+        setSubmitError(result.error || t("error"));
       }
     });
   };
@@ -119,6 +123,11 @@ export function ContactForm({ successMessage }: { successMessage: string }) {
           </p>
         ) : null}
       </div>
+      {submitError ? (
+        <p className="text-sm text-[var(--warning)]" role="alert">
+          {submitError}
+        </p>
+      ) : null}
       <Button type="submit" variant="accent" disabled={pending} className="w-full">
         {pending ? t("loading") : t("sendMessage")}
       </Button>

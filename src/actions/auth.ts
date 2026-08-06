@@ -35,10 +35,25 @@ export async function loginAction(input: unknown) {
       await writeAuditLog("auth.login", "profiles", data.user.id);
     }
 
-    // Remember-me: extend cookie lifetime via session (Supabase handles refresh tokens)
+    // Remember-me: persistent vs browser-session preference (enforced in middleware).
+    const jar = await cookies();
     if (parsed.data.remember) {
-      const jar = await cookies();
       jar.set("mt_remember", "1", {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+        maxAge: 60 * 60 * 24 * 30,
+      });
+      jar.delete("mt_session_only");
+    } else {
+      jar.set("mt_remember", "0", {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+      });
+      jar.set("mt_session_only", "1", {
         httpOnly: true,
         sameSite: "lax",
         secure: process.env.NODE_ENV === "production",
@@ -61,6 +76,7 @@ export async function logoutAction() {
     await supabase.auth.signOut();
     const jar = await cookies();
     jar.delete("mt_remember");
+    jar.delete("mt_session_only");
     await writeAuditLog("auth.logout", "profiles");
   } catch (error) {
     logger.error("logout failed", { error });

@@ -74,6 +74,20 @@ export default async function middleware(request: NextRequest) {
         return NextResponse.redirect(login);
       }
 
+      // Temporary sessions (remember-me unchecked): require live session cookie.
+      // mt_session_only persists across restarts; mt_remember=0 is session-scoped.
+      const sessionOnly = request.cookies.get("mt_session_only")?.value === "1";
+      const rememberLive = request.cookies.get("mt_remember")?.value;
+      if (sessionOnly && rememberLive !== "0") {
+        await supabase.auth.signOut();
+        response.cookies.delete("mt_session_only");
+        response.cookies.delete("mt_remember");
+        const login = request.nextUrl.clone();
+        login.pathname = `/${defaultLocale}/login`;
+        login.searchParams.set("next", pathname);
+        return NextResponse.redirect(login);
+      }
+
       const { data: profile } = await supabase
         .from("profiles")
         .select("is_active")

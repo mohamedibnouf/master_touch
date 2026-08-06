@@ -102,24 +102,38 @@ export async function updateHomepageSectionAction(input: {
     }
 
     if (input.title_ar !== undefined || input.body_ar !== undefined) {
+      const { data: existingAr, error: readArError } = await admin
+        .from("homepage_section_translations")
+        .select("title, body")
+        .eq("section_id", input.id)
+        .eq("locale", "ar")
+        .maybeSingle();
+      if (readArError) throw new DatabaseError(readArError.message, readArError);
       const { error } = await admin.from("homepage_section_translations").upsert(
         {
           section_id: input.id,
           locale: "ar",
-          title: input.title_ar ?? null,
-          body: input.body_ar ?? null,
+          title: input.title_ar !== undefined ? input.title_ar : (existingAr?.title ?? null),
+          body: input.body_ar !== undefined ? input.body_ar : (existingAr?.body ?? null),
         },
         { onConflict: "section_id,locale" },
       );
       if (error) throw new DatabaseError(error.message, error);
     }
     if (input.title_en !== undefined || input.body_en !== undefined) {
+      const { data: existingEn, error: readEnError } = await admin
+        .from("homepage_section_translations")
+        .select("title, body")
+        .eq("section_id", input.id)
+        .eq("locale", "en")
+        .maybeSingle();
+      if (readEnError) throw new DatabaseError(readEnError.message, readEnError);
       const { error } = await admin.from("homepage_section_translations").upsert(
         {
           section_id: input.id,
           locale: "en",
-          title: input.title_en ?? null,
-          body: input.body_en ?? null,
+          title: input.title_en !== undefined ? input.title_en : (existingEn?.title ?? null),
+          body: input.body_en !== undefined ? input.body_en : (existingEn?.body ?? null),
         },
         { onConflict: "section_id,locale" },
       );
@@ -334,9 +348,9 @@ export async function createServiceAction(formData: FormData) {
         icon: String(formData.get("icon") ?? "") || null,
         cover_image_url: String(formData.get("cover_image_url") ?? "") || null,
         is_featured: formData.get("is_featured") === "on",
-        is_published: formData.get("is_published") !== "off",
+        is_published: formData.get("is_published") === "on",
         sort_order: Number(formData.get("sort_order") ?? 0) || 0,
-        status: formData.get("is_published") === "off" ? "draft" : "published",
+        status: formData.get("is_published") === "on" ? "published" : "draft",
       })
       .select("id")
       .single();
@@ -409,7 +423,7 @@ export async function updateServiceAction(formData: FormData) {
       .maybeSingle();
     if (conflict) throw new ValidationError("Slug already exists");
 
-    const published = formData.get("is_published") !== "off";
+    const published = formData.get("is_published") === "on";
     const { error } = await admin
       .from("services")
       .update({

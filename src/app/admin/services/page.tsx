@@ -51,10 +51,10 @@ export default async function AdminServicesPage() {
           <ImageUploadField name="cover_image_url" label="Cover image" className="md:col-span-2" />
           <IconSelect name="icon" label="Icon" className="md:col-span-2" />
           <label className="flex items-center gap-2 text-sm">
-            <input type="checkbox" name="is_featured" /> Featured
+            <input type="checkbox" name="is_featured" value="on" /> Featured
           </label>
           <label className="flex items-center gap-2 text-sm">
-            <input type="checkbox" name="is_published" defaultChecked /> Published
+            <input type="checkbox" name="is_published" value="on" defaultChecked /> Published
           </label>
           <Button type="submit" variant="accent">
             Create
@@ -125,10 +125,22 @@ export default async function AdminServicesPage() {
                   className="md:col-span-2"
                 />
                 <label className="flex items-center gap-2 text-sm">
-                  <input type="checkbox" name="is_featured" defaultChecked={service.is_featured} /> Featured
+                  <input
+                    type="checkbox"
+                    name="is_featured"
+                    value="on"
+                    defaultChecked={service.is_featured}
+                  />{" "}
+                  Featured
                 </label>
                 <label className="flex items-center gap-2 text-sm">
-                  <input type="checkbox" name="is_published" defaultChecked={service.is_published} /> Published
+                  <input
+                    type="checkbox"
+                    name="is_published"
+                    value="on"
+                    defaultChecked={service.is_published}
+                  />{" "}
+                  Published
                 </label>
                 <div className="flex gap-2 md:col-span-2">
                   <Button type="submit" variant="accent">

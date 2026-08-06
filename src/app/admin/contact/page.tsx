@@ -61,7 +61,12 @@ export default async function AdminContactPage() {
             <Input id="map_embed_url" name="map_embed_url" defaultValue={en.map_embed_url ?? ""} />
           </div>
           <label className="flex items-center gap-2 text-sm">
-            <input type="checkbox" name="is_form_enabled" defaultChecked={en.is_form_enabled} />
+            <input
+              type="checkbox"
+              name="is_form_enabled"
+              value="on"
+              defaultChecked={en.is_form_enabled}
+            />
             Form enabled
           </label>
         </Card>

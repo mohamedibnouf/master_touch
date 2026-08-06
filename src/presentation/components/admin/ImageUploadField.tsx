@@ -30,8 +30,8 @@ export function ImageUploadField({
       setError("Please choose an image file (PNG, JPG, WEBP, SVG).");
       return;
     }
-    if (file.size > 8 * 1024 * 1024) {
-      setError("Image must be 8MB or smaller.");
+    if (file.size > 10 * 1024 * 1024) {
+      setError("Image must be 10MB or smaller.");
       return;
     }
 

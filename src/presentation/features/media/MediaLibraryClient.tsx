@@ -60,7 +60,7 @@ export function MediaLibraryClient() {
             }}
             className="space-y-3"
           >
-            <Input name="file" type="file" accept="image/*,video/*,.pdf" required />
+            <Input name="file" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml,application/pdf" required />
             <Input name="alt_text" placeholder="Alt text" />
             <select name="folder_id" className="w-full rounded-lg border border-[var(--border)] px-3 py-2 text-sm">
               <option value="">No folder</option>
