@@ -3,17 +3,31 @@ import { Card, Badge } from "@/presentation/components/ui/primitives";
 import { Button } from "@/presentation/components/ui/button";
 import { EmptyState } from "@/presentation/components/admin/AsyncStates";
 import { listAdminUsersAction } from "@/actions/admin-directory";
+import { can, getCurrentUserPermissions } from "@/lib/permissions";
 
 export default async function AdminUsersPage() {
   const t = await getTranslations("admin");
-  const result = await listAdminUsersAction();
+  const [result, permissions] = await Promise.all([
+    listAdminUsersAction(),
+    getCurrentUserPermissions(),
+  ]);
   const users = result.data;
+  const canManageUsers = can(permissions, "users.manage");
 
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-display text-3xl text-[var(--primary)]">{t("users")}</h1>
-        <Button variant="accent" type="button" disabled title="Invite flow is not enabled in this release">
+        <Button
+          variant="accent"
+          type="button"
+          disabled={!canManageUsers}
+          title={
+            canManageUsers
+              ? undefined
+              : "Requires users.manage permission"
+          }
+        >
           {t("inviteUser")}
         </Button>
       </div>

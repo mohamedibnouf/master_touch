@@ -166,8 +166,8 @@ export function SiteHeader({ brand }: { brand: string }) {
           >
             <BrandLogo
               priority
-              className="h-7 w-auto max-w-[min(52vw,6.75rem)] sm:h-8 sm:max-w-[8rem] lg:h-9 lg:max-w-[9.25rem]"
-              sizes="(max-width:640px) 100px, (max-width:1024px) 128px, 148px"
+              className="h-[calc(var(--header-height)-0.75rem)] w-auto max-w-[min(58vw,calc((var(--header-height)-0.75rem)*1.65))]"
+              sizes="(max-width:640px) 120px, 160px"
             />
           </Link>
           <nav

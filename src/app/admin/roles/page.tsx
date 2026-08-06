@@ -3,11 +3,16 @@ import { Card } from "@/presentation/components/ui/primitives";
 import { Button } from "@/presentation/components/ui/button";
 import { EmptyState } from "@/presentation/components/admin/AsyncStates";
 import { listAdminRolesAction } from "@/actions/admin-directory";
+import { can, getCurrentUserPermissions } from "@/lib/permissions";
 
 export default async function AdminRolesPage() {
   const t = await getTranslations("admin");
-  const result = await listAdminRolesAction();
+  const [result, permissions] = await Promise.all([
+    listAdminRolesAction(),
+    getCurrentUserPermissions(),
+  ]);
   const roles = result.data;
+  const canManageRoles = can(permissions, "roles.manage");
 
   return (
     <div className="space-y-6">
@@ -16,8 +21,12 @@ export default async function AdminRolesPage() {
         <Button
           variant="accent"
           type="button"
-          disabled
-          title="Permission matrix editor is not enabled in this release"
+          disabled={!canManageRoles}
+          title={
+            canManageRoles
+              ? undefined
+              : "Requires roles.manage permission"
+          }
         >
           {t("configurePermissions")}
         </Button>

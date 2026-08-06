@@ -14,11 +14,11 @@ export async function getCurrentUserPermissions(): Promise<string[]> {
 
   // Prefer SECURITY DEFINER RPC so RLS on RBAC tables cannot empty the set
   const { data: keys, error } = await supabase.rpc("get_my_permission_keys");
-  if (!error && Array.isArray(keys)) {
+  if (!error && Array.isArray(keys) && keys.length > 0) {
     return keys as string[];
   }
 
-  // Fallback for environments that have not applied migration 00011 yet
+  // Empty RPC result or missing migration: still honour Super Admin, then join fallback
   const { data: isSa, error: saError } = await supabase.rpc("is_super_admin", {
     p_user_id: user.id,
   });
@@ -28,6 +28,10 @@ export async function getCurrentUserPermissions(): Promise<string[]> {
   if (error) {
     logger.warn("get_my_permission_keys unavailable; using join fallback", {
       message: error.message,
+    });
+  } else if (Array.isArray(keys) && keys.length === 0) {
+    logger.warn("get_my_permission_keys returned empty set; using join fallback", {
+      userId: user.id,
     });
   }
 
