@@ -116,7 +116,13 @@ export function UsersAdminClient({
                 setOpen(false);
                 form.reset();
               } else {
-                setError(res.error);
+                const parts = [
+                  res.error,
+                  res.code ? `code=${res.code}` : null,
+                  typeof res.status === "number" ? `status=${res.status}` : null,
+                  "stack" in res && res.stack ? String(res.stack) : null,
+                ].filter((p): p is string => Boolean(p && String(p).trim()));
+                setError(parts.join(" · ") || "Invite failed");
               }
             });
           }}

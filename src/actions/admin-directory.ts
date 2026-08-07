@@ -3,7 +3,14 @@
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/infrastructure/supabase/admin";
 import { requirePermission, requireAdminAccess, writeAuditLog } from "@/lib/permissions";
-import { DatabaseError, toActionError, ValidationError } from "@/domain/shared/errors";
+import {
+  ConfigurationError,
+  DatabaseError,
+  isAppError,
+  toActionError,
+  ValidationError,
+} from "@/domain/shared/errors";
+import { logger } from "@/infrastructure/logging/logger";
 
 export async function listAdminUsersAction() {
   try {
@@ -167,58 +174,192 @@ export async function getOwnProfileAction() {
 }
 
 export async function inviteAdminUserAction(formData: FormData) {
+  const isDev = process.env.NODE_ENV !== "production";
+
+  const fail = (error: unknown, fallback: string) => {
+    const parsed = parseInviteError(error, fallback);
+    logger.error("inviteAdminUserAction failed", {
+      error,
+      message: parsed.message,
+      code: parsed.code,
+      status: parsed.status,
+    });
+    return {
+      ok: false as const,
+      error: parsed.message,
+      code: parsed.code,
+      status: parsed.status,
+      ...(isDev && parsed.stack ? { stack: parsed.stack } : {}),
+    };
+  };
+
+  let userId: string;
   try {
-    const { userId } = await requirePermission("users.manage");
-    const email = String(formData.get("email") ?? "").trim().toLowerCase();
-    const fullName = String(formData.get("full_name") ?? "").trim();
-    const roleId = String(formData.get("role_id") ?? "").trim();
+    ({ userId } = await requirePermission("users.manage"));
+  } catch (error) {
+    return fail(error, "Permission check failed");
+  }
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      throw new ValidationError("A valid email is required");
-    }
-    if (fullName.length < 2 || fullName.length > 120) {
-      throw new ValidationError("full_name must be 2–120 characters");
-    }
-    if (!roleId) throw new ValidationError("role_id is required");
+  const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  const fullName = String(formData.get("full_name") ?? "").trim();
+  const roleId = String(formData.get("role_id") ?? "").trim();
 
-    const admin = createAdminClient();
-    const { data: role, error: roleError } = await admin
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return fail(new ValidationError("A valid email is required"), "A valid email is required");
+  }
+  if (fullName.length < 2 || fullName.length > 120) {
+    return fail(
+      new ValidationError("full_name must be 2–120 characters"),
+      "full_name must be 2–120 characters",
+    );
+  }
+  if (!roleId) {
+    return fail(new ValidationError("role_id is required"), "role_id is required");
+  }
+
+  const serviceRoleConfigured = Boolean(
+    process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() &&
+      !process.env.SUPABASE_SERVICE_ROLE_KEY.includes("your_service_role"),
+  );
+  if (!serviceRoleConfigured) {
+    return fail(
+      new ConfigurationError("SUPABASE_SERVICE_ROLE_KEY is missing or placeholder"),
+      "SUPABASE_SERVICE_ROLE_KEY is missing or placeholder",
+    );
+  }
+
+  let admin: ReturnType<typeof createAdminClient>;
+  try {
+    admin = createAdminClient();
+  } catch (error) {
+    return fail(error, "Failed to create Supabase service-role client");
+  }
+
+  let role: { id: string; slug: string; is_system: boolean };
+  try {
+    const { data, error: roleError } = await admin
       .from("roles")
       .select("id, slug, is_system")
       .eq("id", roleId)
       .is("deleted_at", null)
       .maybeSingle();
-    if (roleError) throw new DatabaseError(roleError.message, roleError);
-    if (!role) throw new ValidationError("Role not found");
+    if (roleError) throw roleError;
+    if (!data) throw new ValidationError("Role not found");
+    role = data;
+  } catch (error) {
+    return fail(error, "Failed to load role for invite");
+  }
 
-    const base = (process.env.NEXT_PUBLIC_APP_URL ?? "https://www.mastertouchksa.com").replace(/\/$/, "");
+  const base = (process.env.NEXT_PUBLIC_APP_URL ?? "https://www.mastertouchksa.com").replace(/\/$/, "");
+  let newUserId: string;
+  try {
     const { data: invited, error: inviteError } = await admin.auth.admin.inviteUserByEmail(email, {
       data: { full_name: fullName },
       redirectTo: `${base}/ar/login`,
     });
-    if (inviteError) throw new DatabaseError(inviteError.message, inviteError);
-    const newUserId = invited.user?.id;
-    if (!newUserId) throw new DatabaseError("Invite succeeded but no user id was returned");
+    if (inviteError) throw inviteError;
+    if (!invited.user?.id) {
+      throw new DatabaseError("Invite succeeded but no user id was returned");
+    }
+    newUserId = invited.user.id;
+  } catch (error) {
+    return fail(
+      error,
+      "auth.admin.inviteUserByEmail failed (check Auth SMTP / service role / redirect URL)",
+    );
+  }
 
-    // Profile row is created by handle_new_user trigger; ensure name + role.
-    await admin.from("profiles").update({ full_name: fullName, is_active: true }).eq("id", newUserId);
+  try {
+    const { error: profileError } = await admin
+      .from("profiles")
+      .update({ full_name: fullName, is_active: true })
+      .eq("id", newUserId);
+    if (profileError) throw profileError;
+  } catch (error) {
+    return fail(error, "Invite created auth user but failed to update profile");
+  }
+
+  try {
     const { error: urError } = await admin.from("user_roles").insert({
       user_id: newUserId,
       role_id: roleId,
       created_by: userId,
     });
-    if (urError) throw new DatabaseError(urError.message, urError);
+    if (urError) throw urError;
+  } catch (error) {
+    return fail(error, "Invite created auth user but failed to assign role");
+  }
 
+  try {
     await writeAuditLog("users.invite", "profiles", newUserId, {
       email,
       roleId,
       roleSlug: role.slug,
     });
-    revalidatePath("/admin/users");
-    return { ok: true as const, data: { userId: newUserId } };
   } catch (error) {
-    return toActionError(error);
+    logger.warn("invite audit log failed", { error, newUserId });
   }
+
+  revalidatePath("/admin/users");
+  return { ok: true as const, data: { userId: newUserId } };
+}
+
+function pickErrorString(value: unknown): string | null {
+  if (typeof value === "string" && value.trim()) return value.trim();
+  if (value && typeof value === "object") {
+    try {
+      const json = JSON.stringify(value);
+      if (json && json !== "{}" && json !== "null") return json;
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
+
+function parseInviteError(
+  error: unknown,
+  fallback: string,
+): { message: string; code: string; status: number; stack?: string } {
+  if (isAppError(error)) {
+    const causeMessage =
+      error.cause != null ? pickErrorString((error.cause as { message?: unknown }).message) : null;
+    const nested = error.cause != null ? parseInviteError(error.cause, "") : null;
+    return {
+      message: error.message || causeMessage || nested?.message || fallback,
+      code: nested?.code && nested.code !== "APP_ERROR" ? nested.code : String(error.code),
+      status: typeof nested?.status === "number" && nested.status !== 500 ? nested.status : error.status,
+      stack: error.stack ?? nested?.stack,
+    };
+  }
+
+  if (error instanceof Error) {
+    return {
+      message: error.message || fallback,
+      code: "APP_ERROR",
+      status: 500,
+      stack: error.stack,
+    };
+  }
+
+  if (error && typeof error === "object") {
+    const e = error as Record<string, unknown>;
+    const message =
+      pickErrorString(e.message) ||
+      pickErrorString(e.error_description) ||
+      pickErrorString(e.msg) ||
+      pickErrorString(e.error) ||
+      fallback;
+    const code =
+      pickErrorString(e.code) ||
+      (typeof e.error === "string" ? e.error : null) ||
+      "EXTERNAL_SERVICE";
+    const status = typeof e.status === "number" ? e.status : 502;
+    const stack = typeof e.stack === "string" ? e.stack : undefined;
+    return { message, code, status, stack };
+  }
+
+  return { message: fallback, code: "APP_ERROR", status: 500 };
 }
 
 export async function listPermissionCatalogAction() {
