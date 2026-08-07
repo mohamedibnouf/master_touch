@@ -117,11 +117,18 @@ export function UsersAdminClient({
                 form.reset();
               } else {
                 const parts = [
+                  "step" in res && res.step ? `step=${res.step}` : null,
                   res.error,
-                  res.code ? `code=${res.code}` : null,
-                  typeof res.status === "number" ? `status=${res.status}` : null,
+                  res.errorMessage && res.errorMessage !== res.error
+                    ? `message=${res.errorMessage}`
+                    : null,
+                  res.errorCode || res.code ? `code=${res.errorCode ?? res.code}` : null,
+                  typeof (res.errorStatus ?? res.status) === "number"
+                    ? `status=${res.errorStatus ?? res.status}`
+                    : null,
+                  res.errorDescription ? `description=${res.errorDescription}` : null,
                   "stack" in res && res.stack ? String(res.stack) : null,
-                ].filter((p): p is string => Boolean(p && String(p).trim()));
+                ].filter((p): p is string => Boolean(p && String(p).trim() && String(p).trim() !== "{}"));
                 setError(parts.join(" · ") || "Invite failed");
               }
             });
