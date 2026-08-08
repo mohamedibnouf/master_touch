@@ -211,12 +211,12 @@ export function HeroSlider({
           />
         </motion.div>
       </AnimatePresence>
-      {/* Softer veil — fades into page background to hide the section seam */}
-      <div className="absolute inset-0 bg-[linear-gradient(115deg,rgba(6,16,28,0.62)_0%,rgba(10,27,51,0.42)_45%,rgba(30,94,255,0.16)_100%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,transparent_48%,color-mix(in_oklab,var(--background)_35%,transparent)_72%,color-mix(in_oklab,var(--background)_82%,transparent)_90%,var(--background)_100%)]" />
+      {/* Minimal veil — keep images nearly full strength; light text scrim only */}
+      <div className="absolute inset-0 bg-[linear-gradient(115deg,rgba(6,16,28,0.18)_0%,rgba(10,27,51,0.08)_48%,rgba(30,94,255,0.04)_100%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,transparent_62%,color-mix(in_oklab,var(--background)_18%,transparent)_82%,color-mix(in_oklab,var(--background)_55%,transparent)_94%,var(--background)_100%)]" />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[clamp(4rem,10vw,7.5rem)] bg-[linear-gradient(to_top,var(--background)_0%,color-mix(in_oklab,var(--background)_50%,transparent)_55%,transparent_100%)]"
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[clamp(2.5rem,6vw,4.5rem)] bg-[linear-gradient(to_top,var(--background)_0%,color-mix(in_oklab,var(--background)_35%,transparent)_60%,transparent_100%)]"
       />
 
       <div className="relative container-mt flex min-h-[100svh] flex-col justify-end px-[var(--page-gutter)] pb-[max(4rem,calc(env(safe-area-inset-bottom,0px)+3rem))] pt-[calc(var(--header-height)+2.5rem+env(safe-area-inset-top,0px))] md:justify-center md:pb-28">
