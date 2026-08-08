@@ -85,10 +85,11 @@ export async function listAdminUsersAction() {
 
     const ids = (profiles ?? []).map((p) => p.id);
     const roleByUser = new Map<string, string[]>();
+    const roleIdsByUser = new Map<string, string[]>();
     if (ids.length) {
       const { data: userRoles, error: urError } = await admin
         .from("user_roles")
-        .select("user_id, roles(slug)")
+        .select("user_id, role_id, roles(slug)")
         .in("user_id", ids);
       if (urError) throw new DatabaseError(urError.message, urError);
       for (const row of userRoles ?? []) {
@@ -97,6 +98,9 @@ export async function listAdminUsersAction() {
         const list = roleByUser.get(row.user_id) ?? [];
         list.push(role.slug);
         roleByUser.set(row.user_id, list);
+        const idList = roleIdsByUser.get(row.user_id) ?? [];
+        idList.push(row.role_id);
+        roleIdsByUser.set(row.user_id, idList);
       }
     }
 
@@ -115,6 +119,7 @@ export async function listAdminUsersAction() {
           status,
           last_login_at: p.last_login_at,
           roles: roleByUser.get(p.id) ?? [],
+          role_ids: roleIdsByUser.get(p.id) ?? [],
         };
       }),
     };

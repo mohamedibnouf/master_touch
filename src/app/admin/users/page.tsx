@@ -15,12 +15,14 @@ export default async function AdminUsersPage() {
   ]);
 
   const canManageUsers = can(permissions, "users.manage");
+  const canSuperManage = permissions.includes("*");
 
   return (
     <UsersAdminClient
       users={[...usersResult.data]}
       roles={[...rolesResult.data]}
       canManage={canManageUsers}
+      canSuperManage={canSuperManage}
       listError={usersResult.ok ? null : usersResult.error}
     />
   );

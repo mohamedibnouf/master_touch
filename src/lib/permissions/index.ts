@@ -65,12 +65,26 @@ export function can(permissions: string[], permissionKey: string): boolean {
 /**
  * Centralized authorization gate — call at the start of every privileged Server Action.
  */
+async function assertProfileActive(userId: string): Promise<void> {
+  const supabase = await createClient();
+  const { data: profile, error } = await supabase
+    .from("profiles")
+    .select("is_active, deleted_at")
+    .eq("id", userId)
+    .maybeSingle();
+  if (error) throw new DatabaseError(error.message, error);
+  if (profile?.deleted_at || profile?.is_active === false) {
+    throw new AuthorizationError("Account is inactive");
+  }
+}
+
 export async function requirePermission(permissionKey: string): Promise<{
   userId: string;
   permissions: string[];
 }> {
   const { user } = await requireAuthUser();
   if (!user) throw new AuthenticationError();
+  await assertProfileActive(user.id);
 
   const permissions = await getCurrentUserPermissions();
   if (!can(permissions, permissionKey)) {
@@ -79,6 +93,32 @@ export async function requirePermission(permissionKey: string): Promise<{
   }
 
   return { userId: user.id, permissions };
+}
+
+/** Privileged user-management mutations — Super Admin only (server-verified). */
+export async function requireSuperAdmin(): Promise<{
+  userId: string;
+  permissions: string[];
+}> {
+  const { user } = await requireAuthUser();
+  if (!user) throw new AuthenticationError();
+  await assertProfileActive(user.id);
+
+  const supabase = await createClient();
+  const { data: isSa, error: saError } = await supabase.rpc("is_super_admin", {
+    p_user_id: user.id,
+  });
+  if (saError) throw new DatabaseError(saError.message, saError);
+
+  if (!isSa) {
+    const permissions = await getCurrentUserPermissions();
+    if (!permissions.includes("*")) {
+      logger.audit("authorization.denied", { userId: user.id, permissionKey: "super_admin" });
+      throw new AuthorizationError("Super Admin required");
+    }
+  }
+
+  return { userId: user.id, permissions: ["*"] };
 }
 
 /** Admin layout / middleware: any authenticated user with dashboard access (or CMS module). */
@@ -92,11 +132,11 @@ export async function requireAdminAccess(): Promise<{
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("is_active, email")
+    .select("is_active, email, deleted_at")
     .eq("id", user.id)
     .maybeSingle();
 
-  if (profile && profile.is_active === false) {
+  if (profile && (profile.is_active === false || profile.deleted_at)) {
     throw new AuthorizationError("Account is inactive");
   }
 

@@ -28,7 +28,17 @@ export async function loginAction(input: unknown) {
     if (error) throw new AuthenticationError(error.message);
 
     if (data.user) {
-      await createAdminClient()
+      const admin = createAdminClient();
+      const { data: profile } = await admin
+        .from("profiles")
+        .select("is_active, deleted_at")
+        .eq("id", data.user.id)
+        .maybeSingle();
+      if (profile?.is_active === false || profile?.deleted_at) {
+        await supabase.auth.signOut();
+        throw new AuthenticationError("Account is inactive");
+      }
+      await admin
         .from("profiles")
         .update({ last_login_at: new Date().toISOString() })
         .eq("id", data.user.id);

@@ -90,11 +90,11 @@ export default async function middleware(request: NextRequest) {
 
       const { data: profile } = await supabase
         .from("profiles")
-        .select("is_active")
+        .select("is_active, deleted_at")
         .eq("id", user.id)
         .maybeSingle();
 
-      if (profile && profile.is_active === false) {
+      if (profile && (profile.is_active === false || profile.deleted_at)) {
         const login = request.nextUrl.clone();
         login.pathname = `/${defaultLocale}/login`;
         login.searchParams.set("error", "inactive");
