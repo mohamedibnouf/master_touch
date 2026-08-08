@@ -29,12 +29,12 @@ export async function listAdminUsersAction() {
     if (ids.length) {
       const { data: userRoles, error: urError } = await admin
         .from("user_roles")
-        .select("user_id, roles(slug, name)")
+        .select("user_id, roles(slug)")
         .in("user_id", ids);
       if (urError) throw new DatabaseError(urError.message, urError);
       for (const row of userRoles ?? []) {
-        const role = row.roles as unknown as { slug: string; name: string } | null;
-        if (!role) continue;
+        const role = row.roles as unknown as { slug: string } | null;
+        if (!role?.slug) continue;
         const list = roleByUser.get(row.user_id) ?? [];
         list.push(role.slug);
         roleByUser.set(row.user_id, list);
@@ -333,10 +333,18 @@ export async function inviteAdminUserAction(formData: FormData) {
       created_by: userId,
     });
     if (urError) {
-      return failAt("roleAssignment", urError, "Invite created auth user but failed to assign role");
+      return failAt(
+        "roleAssignment",
+        urError,
+        "Invitation email was sent, but role assignment failed. The user can sign in; assign a role manually.",
+      );
     }
   } catch (error) {
-    return failAt("roleAssignment", error, "Invite created auth user but failed to assign role");
+    return failAt(
+      "roleAssignment",
+      error,
+      "Invitation email was sent, but role assignment failed. The user can sign in; assign a role manually.",
+    );
   }
 
   try {
