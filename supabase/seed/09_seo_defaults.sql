@@ -23,6 +23,6 @@ VALUES
   ('44444444-4444-4444-4444-444444444002', 'en', 'About Us | Master Touch', 'Vision, mission, values, and achievements of Master Touch.', 'about, Master Touch, Vision 2030', 'index,follow'),
   ('44444444-4444-4444-4444-444444444003', 'ar', 'خدماتنا | ماستر تاتش', 'كهروميكانيك، تشطيبات معمارية، حلول تقنية، وصيانة وتشغيل.', 'خدمات, MEP, تشطيبات', 'index,follow'),
   ('44444444-4444-4444-4444-444444444003', 'en', 'Services | Master Touch', 'Electromechanical, architectural finishing, smart IT, and O&M.', 'services, MEP, finishing', 'index,follow'),
-  ('44444444-4444-4444-4444-444444444004', 'ar', 'تواصل معنا | ماستر تاتش', 'info@mastertouchksa.com | +966-50-683-4610 | الرياض', 'تواصل, ماستر تاتش', 'index,follow'),
-  ('44444444-4444-4444-4444-444444444004', 'en', 'Contact | Master Touch', 'info@mastertouchksa.com | +966-50-683-4610 | Riyadh', 'contact, Master Touch', 'index,follow')
+  ('44444444-4444-4444-4444-444444444004', 'ar', 'تواصل معنا | ماستر تاتش', 'info@mastertouch-ksa.com | +966 506834610 | الرياض', 'تواصل, ماستر تاتش', 'index,follow'),
+  ('44444444-4444-4444-4444-444444444004', 'en', 'Contact | Master Touch', 'info@mastertouch-ksa.com | +966 506834610 | Riyadh', 'contact, Master Touch', 'index,follow')
 ON CONFLICT (page_id, locale) DO NOTHING;

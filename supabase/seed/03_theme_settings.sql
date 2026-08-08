@@ -39,7 +39,7 @@ VALUES (
   '{"ar":"ماستر تاتش","en":"Master Touch"}'::JSONB,
   '{"ar":"اللمسة الأخيرة نحو التميز والتقنية","en":"The final touch toward excellence and technology"}'::JSONB,
   'ar',
-  'https://www.mastertouchksa.com',
+  'https://www.mastertouch-ksa.com',
   '{"linkedin":"","twitter":"","instagram":"","youtube":""}'::JSONB,
   '{"sticky":true,"transparent":true,"announcement_enabled":false}'::JSONB,
   '{"show_newsletter":false,"show_social":true}'::JSONB

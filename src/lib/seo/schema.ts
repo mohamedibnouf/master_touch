@@ -8,10 +8,10 @@ export function organizationJsonLd() {
     "@type": "Organization",
     name: "Master Touch",
     alternateName: "ماستر تاتش",
-    url: "https://www.mastertouchksa.com",
+    url: "https://www.mastertouch-ksa.com",
     logo: `${baseUrl()}/images/logo-master-touch.png`,
-    email: "info@mastertouchksa.com",
-    telephone: "+966-50-683-4610",
+    email: "info@mastertouch-ksa.com",
+    telephone: "+966 506834610",
     address: {
       "@type": "PostalAddress",
       addressLocality: "Riyadh",

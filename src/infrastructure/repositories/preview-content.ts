@@ -39,7 +39,7 @@ export const previewSiteSettings: SiteSettings = {
     en: "The final touch toward excellence and technology",
   },
   default_locale: "ar",
-  website_url: "https://www.mastertouchksa.com",
+  website_url: "https://www.mastertouch-ksa.com",
   social_links: {},
   header_settings: {},
   footer_settings: {},
@@ -422,7 +422,7 @@ export function previewContactContent(locale: AppLocale): ContactContent {
       en: { sunday_thursday: "8:00 AM – 5:00 PM", friday: "Closed", saturday: "By appointment" },
     },
     is_form_enabled: true,
-    notify_email: "info@mastertouchksa.com",
+    notify_email: "info@mastertouch-ksa.com",
     headline: ar ? "تواصل معنا" : "Contact us",
     intro: ar ? "يسعدنا استقبال استفساراتكم ومشاريعكم القادمة." : "We welcome your inquiries and upcoming projects.",
     form_success_message: ar
@@ -441,10 +441,10 @@ export function previewContactContent(locale: AppLocale): ContactContent {
       },
     ],
     channels: [
-      { id: "c1", channel_type: "email", value: "info@mastertouchksa.com", label: "Email", is_primary: true },
-      { id: "c2", channel_type: "phone", value: "+966-50-683-4610", label: "Phone", is_primary: true },
+      { id: "c1", channel_type: "email", value: "info@mastertouch-ksa.com", label: "Email", is_primary: true },
+      { id: "c2", channel_type: "phone", value: "+966 506834610", label: "Phone", is_primary: true },
       { id: "c3", channel_type: "whatsapp", value: "+966506834610", label: "WhatsApp", is_primary: false },
-      { id: "c4", channel_type: "other", value: "www.mastertouchksa.com", label: "Website", is_primary: false },
+      { id: "c4", channel_type: "other", value: "mastertouch-ksa.com", label: "Website", is_primary: false },
     ],
   };
 }

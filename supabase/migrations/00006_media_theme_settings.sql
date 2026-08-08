@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS public.site_settings (
   tagline_i18n JSONB NOT NULL DEFAULT '{}'::JSONB,
   default_locale public.app_locale NOT NULL DEFAULT 'ar',
   supported_locales public.app_locale[] NOT NULL DEFAULT ARRAY['ar','en']::public.app_locale[],
-  website_url TEXT DEFAULT 'https://www.mastertouchksa.com',
+  website_url TEXT DEFAULT 'https://www.mastertouch-ksa.com',
   social_links JSONB NOT NULL DEFAULT '{}'::JSONB,
   header_settings JSONB NOT NULL DEFAULT '{"sticky":true,"transparent":false}'::JSONB,
   footer_settings JSONB NOT NULL DEFAULT '{}'::JSONB,

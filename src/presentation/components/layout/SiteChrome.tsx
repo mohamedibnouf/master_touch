@@ -303,26 +303,26 @@ export function SiteFooter({
               <p className="site-footer__heading">{t("contact")}</p>
               <ul className="mt-5 space-y-1">
                 <li>
-                  <a className="site-footer__link" href="mailto:info@mastertouchksa.com">
+                  <a className="site-footer__link" href="mailto:info@mastertouch-ksa.com">
                     <Mail className="h-4 w-4 shrink-0 text-[var(--accent)]" aria-hidden />
-                    <span className="break-all">info@mastertouchksa.com</span>
+                    <span className="min-w-0 break-words">info@mastertouch-ksa.com</span>
                   </a>
                 </li>
                 <li>
                   <a className="site-footer__link" href="tel:+966506834610" dir="ltr">
                     <Phone className="h-4 w-4 shrink-0 text-[var(--accent)]" aria-hidden />
-                    +966-50-683-4610
+                    +966 506834610
                   </a>
                 </li>
                 <li>
                   <a
                     className="site-footer__link"
-                    href="https://www.mastertouchksa.com"
+                    href="https://www.mastertouch-ksa.com"
                     rel="noopener noreferrer"
                     target="_blank"
                   >
                     <Globe className="h-4 w-4 shrink-0 text-[var(--accent)]" aria-hidden />
-                    <span className="break-all">www.mastertouchksa.com</span>
+                    <span className="min-w-0 break-words">mastertouch-ksa.com</span>
                   </a>
                 </li>
               </ul>

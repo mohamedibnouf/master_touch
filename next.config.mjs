@@ -14,6 +14,8 @@ const nextConfig = {
     remotePatterns: [
       { protocol: "https", hostname: "**.supabase.co" },
       { protocol: "https", hostname: "www.mastertouchksa.com" },
+      { protocol: "https", hostname: "www.mastertouch-ksa.com" },
+      { protocol: "https", hostname: "mastertouch-ksa.com" },
     ],
   },
 
@@ -46,7 +48,7 @@ const nextConfig = {
             "frame-ancestors 'none'",
             "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
             "style-src 'self' 'unsafe-inline'",
-            "img-src 'self' data: blob: https://*.supabase.co https://www.mastertouchksa.com",
+            "img-src 'self' data: blob: https://*.supabase.co https://www.mastertouchksa.com https://www.mastertouch-ksa.com https://mastertouch-ksa.com",
             "font-src 'self' data:",
             "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.upstash.io",
             "frame-src 'self' https://www.google.com https://maps.google.com https://*.google.com",

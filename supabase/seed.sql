@@ -216,7 +216,7 @@ VALUES (
   '{"ar":"ماستر تاتش","en":"Master Touch"}'::JSONB,
   '{"ar":"اللمسة الأخيرة نحو التميز والتقنية","en":"The final touch toward excellence and technology"}'::JSONB,
   'ar',
-  'https://www.mastertouchksa.com',
+  'https://www.mastertouch-ksa.com',
   '{"linkedin":"","twitter":"","instagram":"","youtube":""}'::JSONB,
   '{"sticky":true,"transparent":true,"announcement_enabled":false}'::JSONB,
   '{"show_newsletter":false,"show_social":true}'::JSONB
@@ -563,7 +563,7 @@ VALUES (
   'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3624.0!2d46.6753!3d24.7136!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjTCsDQyJzQ5LjAiTiA0NsKwNDAnMzEuMSJF!5e0!3m2!1sen!2ssa!4v1700000000000',
   '{"ar":{"sunday_thursday":"8:00 ص – 5:00 م","friday":"مغلق","saturday":"حسب الموعد"},"en":{"sunday_thursday":"8:00 AM – 5:00 PM","friday":"Closed","saturday":"By appointment"}}'::JSONB,
   TRUE,
-  'info@mastertouchksa.com'
+  'info@mastertouch-ksa.com'
 )
 ON CONFLICT (id) DO NOTHING;
 
@@ -593,10 +593,10 @@ ON CONFLICT (branch_id, locale) DO NOTHING;
 
 INSERT INTO public.contact_channels (id, settings_id, branch_id, channel_type, value, label, sort_order, is_primary, is_enabled)
 VALUES
-  ('cccccccc-cccc-cccc-cccc-cccccccccc11', 'cccccccc-cccc-cccc-cccc-cccccccccc01', 'cccccccc-cccc-cccc-cccc-cccccccccc02', 'email', 'info@mastertouchksa.com', 'Email', 1, TRUE, TRUE),
-  ('cccccccc-cccc-cccc-cccc-cccccccccc12', 'cccccccc-cccc-cccc-cccc-cccccccccc01', 'cccccccc-cccc-cccc-cccc-cccccccccc02', 'phone', '+966-50-683-4610', 'Phone', 2, TRUE, TRUE),
+  ('cccccccc-cccc-cccc-cccc-cccccccccc11', 'cccccccc-cccc-cccc-cccc-cccccccccc01', 'cccccccc-cccc-cccc-cccc-cccccccccc02', 'email', 'info@mastertouch-ksa.com', 'Email', 1, TRUE, TRUE),
+  ('cccccccc-cccc-cccc-cccc-cccccccccc12', 'cccccccc-cccc-cccc-cccc-cccccccccc01', 'cccccccc-cccc-cccc-cccc-cccccccccc02', 'phone', '+966 506834610', 'Phone', 2, TRUE, TRUE),
   ('cccccccc-cccc-cccc-cccc-cccccccccc13', 'cccccccc-cccc-cccc-cccc-cccccccccc01', 'cccccccc-cccc-cccc-cccc-cccccccccc02', 'whatsapp', '+966506834610', 'WhatsApp', 3, FALSE, TRUE),
-  ('cccccccc-cccc-cccc-cccc-cccccccccc14', 'cccccccc-cccc-cccc-cccc-cccccccccc01', NULL, 'other', 'www.mastertouchksa.com', 'Website', 4, FALSE, TRUE)
+  ('cccccccc-cccc-cccc-cccc-cccccccccc14', 'cccccccc-cccc-cccc-cccc-cccccccccc01', NULL, 'other', 'mastertouch-ksa.com', 'Website', 4, FALSE, TRUE)
 ON CONFLICT (id) DO NOTHING;
 -- <<< END seed/08_contact.sql
 
@@ -626,8 +626,8 @@ VALUES
   ('44444444-4444-4444-4444-444444444002', 'en', 'About Us | Master Touch', 'Vision, mission, values, and achievements of Master Touch.', 'about, Master Touch, Vision 2030', 'index,follow'),
   ('44444444-4444-4444-4444-444444444003', 'ar', 'خدماتنا | ماستر تاتش', 'كهروميكانيك، تشطيبات معمارية، حلول تقنية، وصيانة وتشغيل.', 'خدمات, MEP, تشطيبات', 'index,follow'),
   ('44444444-4444-4444-4444-444444444003', 'en', 'Services | Master Touch', 'Electromechanical, architectural finishing, smart IT, and O&M.', 'services, MEP, finishing', 'index,follow'),
-  ('44444444-4444-4444-4444-444444444004', 'ar', 'تواصل معنا | ماستر تاتش', 'info@mastertouchksa.com | +966-50-683-4610 | الرياض', 'تواصل, ماستر تاتش', 'index,follow'),
-  ('44444444-4444-4444-4444-444444444004', 'en', 'Contact | Master Touch', 'info@mastertouchksa.com | +966-50-683-4610 | Riyadh', 'contact, Master Touch', 'index,follow')
+  ('44444444-4444-4444-4444-444444444004', 'ar', 'تواصل معنا | ماستر تاتش', 'info@mastertouch-ksa.com | +966 506834610 | الرياض', 'تواصل, ماستر تاتش', 'index,follow'),
+  ('44444444-4444-4444-4444-444444444004', 'en', 'Contact | Master Touch', 'info@mastertouch-ksa.com | +966 506834610 | Riyadh', 'contact, Master Touch', 'index,follow')
 ON CONFLICT (page_id, locale) DO NOTHING;
 -- <<< END seed/09_seo_defaults.sql
 
