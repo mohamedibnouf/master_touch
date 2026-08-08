@@ -36,7 +36,7 @@ export function LoginForm({
   accessError,
 }: {
   nextPath?: string;
-  accessError?: "forbidden" | "inactive" | null;
+  accessError?: "forbidden" | "inactive" | "auth_link_invalid" | null;
 }) {
   const t = useTranslations("auth");
   const common = useTranslations("common");
@@ -44,6 +44,7 @@ export function LoginForm({
   const [error, setError] = useState<string | null>(() => {
     if (accessError === "forbidden") return t("forbidden");
     if (accessError === "inactive") return t("inactive");
+    if (accessError === "auth_link_invalid") return t("authLinkInvalid");
     return null;
   });
   const [pending, startTransition] = useTransition();

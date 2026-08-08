@@ -19,7 +19,9 @@ export default async function LoginPage({
   setRequestLocale(locale as Locale);
 
   const accessError =
-    error === "forbidden" || error === "inactive" ? error : null;
+    error === "forbidden" || error === "inactive" || error === "auth_link_invalid"
+      ? error
+      : null;
 
   return (
     <div className="flex min-h-[calc(100svh-var(--header-height))] items-center px-[var(--page-gutter)] pt-24 pb-16">

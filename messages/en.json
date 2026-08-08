@@ -72,7 +72,8 @@
     "updatePassword": "Update password",
     "resetSent": "If the email exists, a reset link has been sent.",
     "forbidden": "Signed in successfully, but this account has no admin access. Assign a role (e.g. super_admin) then try again.",
-    "inactive": "This account is inactive. Contact an administrator."
+    "inactive": "This account is inactive. Contact an administrator.",
+    "authLinkInvalid": "This invitation or verification link is invalid or expired. Ask an administrator to resend the invite."
   },
   "admin": {
     "dashboard": "Dashboard",

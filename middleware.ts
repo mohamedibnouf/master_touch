@@ -31,6 +31,11 @@ function hasAdminCapability(keys: string[] | null | undefined): boolean {
 export default async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Auth confirm / callback routes must stay on the apex path (no locale prefix).
+  if (pathname.startsWith("/auth/")) {
+    return NextResponse.next({ request });
+  }
+
   if (pathname.startsWith("/admin") || pathname.startsWith("/api/")) {
     let response = NextResponse.next({ request });
 

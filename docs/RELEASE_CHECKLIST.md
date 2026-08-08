@@ -115,8 +115,9 @@ None of the above block RC1 ship if deployment checklist items are completed.
 ### Pre-deploy
 
 - [ ] Set production env: `NEXT_PUBLIC_APP_URL`, Supabase URL/anon, `SUPABASE_SERVICE_ROLE_KEY`, Upstash URL/token
-- [ ] Confirm Supabase Auth redirect URLs: `{APP_URL}/ar/reset-password`, `{APP_URL}/en/reset-password`
-- [ ] Confirm Site URL / allowed redirect URLs in Supabase dashboard
+- [ ] Confirm Supabase Site URL: `https://mastertouch-ksa.com`
+- [ ] Confirm Auth redirect URLs include: `/auth/confirm`, `/ar/reset-password`, `/en/reset-password`, `/ar/login`, `/en/login`
+- [ ] Invite email template uses `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=invite` (not `{{ .ConfirmationURL }}`)
 - [ ] `NODE_ENV=production`, `HOSTNAME=0.0.0.0` (Passenger/cPanel)
 - [ ] Run `npm ci && npm run lint && npm run typecheck && npm run build`
 - [ ] Smoke `/api/health` → `healthy` (or accept `redis: skip` only if rate limits intentionally disabled)
