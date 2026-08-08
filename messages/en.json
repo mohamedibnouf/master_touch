@@ -120,6 +120,8 @@
     "featured": "Featured",
     "published": "Published",
     "active": "Active",
+    "pending": "Pending",
+    "disabled": "Disabled",
     "confirmDelete": "Are you sure you want to delete this item?",
     "noUsers": "No users found",
     "noServices": "No services found",

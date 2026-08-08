@@ -120,6 +120,8 @@
     "featured": "مميز",
     "published": "منشور",
     "active": "نشط",
+    "pending": "معلّق",
+    "disabled": "معطّل",
     "confirmDelete": "هل أنت متأكد من حذف هذا العنصر؟",
     "noUsers": "لا يوجد مستخدمون",
     "noServices": "لا توجد خدمات",

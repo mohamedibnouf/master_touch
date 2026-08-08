@@ -12,6 +12,65 @@ import {
 } from "@/domain/shared/errors";
 import { logger } from "@/infrastructure/logging/logger";
 
+/** Admin UI lifecycle — not the same as profiles.is_active (account enabled flag). */
+export type AdminUserStatus = "pending" | "active" | "disabled";
+
+type AuthLifecycleFields = {
+  email_confirmed_at?: string | null;
+  confirmed_at?: string | null;
+  invited_at?: string | null;
+  confirmation_sent_at?: string | null;
+  last_sign_in_at?: string | null;
+  banned_until?: string | null;
+};
+
+function resolveAdminUserStatus(
+  profileActive: boolean,
+  auth: AuthLifecycleFields | undefined,
+): AdminUserStatus {
+  if (!profileActive) return "disabled";
+  if (auth?.banned_until) {
+    const until = Date.parse(auth.banned_until);
+    if (!Number.isNaN(until) && until > Date.now()) return "disabled";
+  }
+  // Existence in Auth ≠ active. Invited users stay pending until confirmation.
+  if (auth?.email_confirmed_at || auth?.confirmed_at) return "active";
+  return "pending";
+}
+
+async function loadAuthLifecycleByUserId(
+  admin: ReturnType<typeof createAdminClient>,
+  userIds: string[],
+): Promise<Map<string, AuthLifecycleFields>> {
+  const map = new Map<string, AuthLifecycleFields>();
+  if (!userIds.length) return map;
+
+  const wanted = new Set(userIds);
+  let page = 1;
+  const perPage = 200;
+  // Cap pages so a huge Auth directory cannot stall the users list.
+  for (let i = 0; i < 10 && wanted.size > 0; i += 1) {
+    const { data, error } = await admin.auth.admin.listUsers({ page, perPage });
+    if (error) throw new DatabaseError(error.message, error);
+    const users = data?.users ?? [];
+    for (const u of users) {
+      if (!wanted.has(u.id)) continue;
+      map.set(u.id, {
+        email_confirmed_at: u.email_confirmed_at ?? null,
+        confirmed_at: u.confirmed_at ?? null,
+        invited_at: u.invited_at ?? null,
+        confirmation_sent_at: u.confirmation_sent_at ?? null,
+        last_sign_in_at: u.last_sign_in_at ?? null,
+        banned_until: u.banned_until ?? null,
+      });
+      wanted.delete(u.id);
+    }
+    if (users.length < perPage) break;
+    page += 1;
+  }
+  return map;
+}
+
 export async function listAdminUsersAction() {
   try {
     await requirePermission("users.view");
@@ -41,16 +100,23 @@ export async function listAdminUsersAction() {
       }
     }
 
+    const authById = await loadAuthLifecycleByUserId(admin, ids);
+
     return {
       ok: true as const,
-      data: (profiles ?? []).map((p) => ({
-        id: p.id,
-        email: p.email,
-        full_name: p.full_name,
-        is_active: p.is_active,
-        last_login_at: p.last_login_at,
-        roles: roleByUser.get(p.id) ?? [],
-      })),
+      data: (profiles ?? []).map((p) => {
+        const auth = authById.get(p.id);
+        const status = resolveAdminUserStatus(p.is_active !== false, auth);
+        return {
+          id: p.id,
+          email: p.email,
+          full_name: p.full_name,
+          is_active: p.is_active,
+          status,
+          last_login_at: p.last_login_at,
+          roles: roleByUser.get(p.id) ?? [],
+        };
+      }),
     };
   } catch (error) {
     return { ...toActionError(error), data: [] as const };
@@ -285,11 +351,13 @@ export async function inviteAdminUserAction(formData: FormData) {
   }
 
   const base = (process.env.NEXT_PUBLIC_APP_URL ?? "https://www.mastertouchksa.com").replace(/\/$/, "");
+  // Prefer reset-password (documented Auth redirect allowlist) so invitees can set a password.
+  const inviteRedirectTo = `${base}/ar/reset-password`;
   let newUserId: string;
   try {
     const { data: invited, error: inviteError } = await admin.auth.admin.inviteUserByEmail(email, {
       data: { full_name: fullName },
-      redirectTo: `${base}/ar/login`,
+      redirectTo: inviteRedirectTo,
     });
     if (inviteError) {
       return failAt(
@@ -306,6 +374,39 @@ export async function inviteAdminUserAction(formData: FormData) {
       );
     }
     newUserId = invited.user.id;
+
+    // Re-read Auth user — response may omit mailer timestamps; do not treat create-as-success.
+    const { data: refreshed, error: refreshError } = await admin.auth.admin.getUserById(newUserId);
+    if (refreshError) {
+      return failAt(
+        "inviteEmail",
+        refreshError,
+        "User was created but invitation email status could not be verified",
+      );
+    }
+    const authUser = refreshed?.user ?? invited.user;
+    const invitationQueued = Boolean(authUser.invited_at || authUser.confirmation_sent_at);
+
+    logger.info("inviteAdminUserAction auth invite result", {
+      step: "inviteUserByEmail",
+      userId: newUserId,
+      email,
+      redirectTo: inviteRedirectTo,
+      invited_at: authUser.invited_at ?? null,
+      confirmation_sent_at: authUser.confirmation_sent_at ?? null,
+      email_confirmed_at: authUser.email_confirmed_at ?? null,
+      confirmed_at: authUser.confirmed_at ?? null,
+      last_sign_in_at: authUser.last_sign_in_at ?? null,
+      invitationQueued,
+    });
+
+    if (!invitationQueued) {
+      return failAt(
+        "inviteEmail",
+        new DatabaseError("User was created but invitation email could not be sent"),
+        "User was created but invitation email could not be sent",
+      );
+    }
   } catch (error) {
     return failAt(
       "inviteUserByEmail",
@@ -315,9 +416,10 @@ export async function inviteAdminUserAction(formData: FormData) {
   }
 
   try {
+    // Do NOT set is_active / email_confirmed — invited users stay pending until Auth confirms.
     const { error: profileError } = await admin
       .from("profiles")
-      .update({ full_name: fullName, is_active: true })
+      .update({ full_name: fullName })
       .eq("id", newUserId);
     if (profileError) {
       return failAt("profileUpdate", profileError, "Invite created auth user but failed to update profile");
@@ -371,6 +473,7 @@ type InviteFailStep =
   | "createAdminClient"
   | "loadRole"
   | "inviteUserByEmail"
+  | "inviteEmail"
   | "profileUpdate"
   | "roleAssignment";
 

@@ -11,13 +11,14 @@ import {
   ErrorState,
   SuccessBanner,
 } from "@/presentation/components/admin/AsyncStates";
-import { inviteAdminUserAction } from "@/actions/admin-directory";
+import { inviteAdminUserAction, type AdminUserStatus } from "@/actions/admin-directory";
 
 type AdminUser = {
   id: string;
   email: string;
   full_name: string | null;
   is_active: boolean;
+  status: AdminUserStatus;
   roles: string[];
 };
 
@@ -85,10 +86,12 @@ export function UsersAdminClient({
               {(u.roles.length ? u.roles : ["unassigned"]).map((role) => (
                 <Badge key={role}>{role}</Badge>
               ))}
-              {u.is_active ? (
+              {u.status === "active" ? (
                 <Badge className="bg-emerald-50 text-emerald-700">{t("active")}</Badge>
+              ) : u.status === "pending" ? (
+                <Badge className="bg-amber-50 text-amber-800">{t("pending")}</Badge>
               ) : (
-                <Badge className="bg-[var(--muted)] text-[var(--muted-foreground)]">inactive</Badge>
+                <Badge className="bg-[var(--muted)] text-[var(--muted-foreground)]">{t("disabled")}</Badge>
               )}
             </div>
           </Card>
