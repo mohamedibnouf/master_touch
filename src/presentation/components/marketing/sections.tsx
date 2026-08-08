@@ -193,7 +193,7 @@ export function HeroSlider({
     HERO_BACKGROUNDS[0];
 
   return (
-    <section className="relative min-h-[100svh] overflow-hidden text-white">
+    <section className="relative min-h-[100svh] overflow-hidden text-[#06101c]">
       <AnimatePresence mode="wait">
         <motion.div
           key={media}
@@ -224,7 +224,7 @@ export function HeroSlider({
           initial={reduceMotion ? false : { opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: reduceMotion ? 0 : 0.7, delay: reduceMotion ? 0 : 0.08 }}
-          className="eyebrow mb-5 text-white"
+          className="eyebrow mb-5 text-[#06101c] [text-shadow:0_1px_10px_rgba(255,255,255,0.55)]"
         >
           {locale === "ar" ? "حلول هندسية متكاملة" : "Integrated engineering solutions"}
         </motion.p>
@@ -232,7 +232,7 @@ export function HeroSlider({
           initial={reduceMotion ? false : { opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: reduceMotion ? 0 : 0.7, delay: reduceMotion ? 0 : 0.14 }}
-          className="text-sm font-medium tracking-[0.08em] text-white/75 md:text-base"
+          className="text-sm font-medium tracking-[0.08em] text-[#0a1b33]/90 md:text-base [text-shadow:0_1px_10px_rgba(255,255,255,0.5)]"
         >
           {section.title}
         </motion.p>
@@ -246,10 +246,10 @@ export function HeroSlider({
             transition={{ duration: reduceMotion ? 0 : 0.55, ease: [0.22, 1, 0.36, 1] }}
             className="mt-6 max-w-xl"
           >
-            <h1 className="font-display text-display font-semibold tracking-tight text-white">
+            <h1 className="font-display text-display font-semibold tracking-tight text-[#06101c] [text-shadow:0_1px_14px_rgba(255,255,255,0.65)]">
               {slide?.title ?? section.subtitle}
             </h1>
-            <p className="mt-4 text-base leading-relaxed text-white/70 md:text-lg">
+            <p className="mt-4 text-base leading-relaxed text-[#0a1b33]/85 md:text-lg [text-shadow:0_1px_10px_rgba(255,255,255,0.55)]">
               {slide?.subtitle ?? section.body}
             </p>
             <div className="mt-10 flex flex-wrap items-center gap-3">
@@ -278,12 +278,12 @@ export function HeroSlider({
                 aria-selected={i === index}
                 aria-label={`Slide ${i + 1}`}
                 onClick={() => setIndex(i)}
-                className="inline-flex min-h-11 min-w-11 items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
+                className="inline-flex min-h-11 min-w-11 items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]/40"
               >
                 <span
                   className={cn(
                     "h-px transition-all duration-500",
-                    i === index ? "w-12 bg-[var(--accent)]" : "w-6 bg-white/35",
+                    i === index ? "w-12 bg-[var(--accent)]" : "w-6 bg-[#06101c]/35",
                   )}
                 />
               </button>
