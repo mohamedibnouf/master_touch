@@ -23,7 +23,7 @@ export const previewThemeSettings: ThemeSettings = {
   button_style: {},
   card_style: {},
   animation_settings: {},
-  dark_mode_enabled: true,
+  dark_mode_enabled: false,
   logo_light_url: null,
   logo_dark_url: null,
   favicon_url: null,

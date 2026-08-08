@@ -152,7 +152,7 @@ export function RolesAdminClient({
             <Label htmlFor="role-select">{t("roles")}</Label>
             <select
               id="role-select"
-              className="flex h-11 w-full rounded-[var(--radius)] border border-[var(--line)] bg-white px-3 text-sm dark:bg-[var(--surface)]"
+              className="flex h-11 w-full rounded-[var(--radius)] border border-[var(--line)] bg-white px-3 text-sm"
               value={selectedRoleId}
               onChange={(e) => {
                 const next = e.target.value;

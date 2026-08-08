@@ -93,7 +93,7 @@ export function ConfirmDialog({
       aria-modal="true"
       aria-labelledby="confirm-title"
     >
-      <div className="w-full max-w-md rounded-[var(--radius)] bg-white p-6 shadow-[var(--shadow-lift)] dark:bg-[var(--surface)]">
+      <div className="w-full max-w-md rounded-[var(--radius)] bg-white p-6 shadow-[var(--shadow-lift)]">
         <h2 id="confirm-title" className="text-lg font-semibold text-[var(--primary)]">
           {title}
         </h2>
@@ -148,7 +148,7 @@ export function AdminModal({
       />
       <div
         className={cn(
-          "relative z-[1] max-h-[min(90svh,44rem)] w-full overflow-y-auto rounded-[var(--radius)] bg-white p-6 shadow-[var(--shadow-lift)] dark:bg-[var(--surface)]",
+          "relative z-[1] max-h-[min(90svh,44rem)] w-full overflow-y-auto rounded-[var(--radius)] bg-white p-6 shadow-[var(--shadow-lift)]",
           wide ? "max-w-3xl" : "max-w-md",
         )}
       >

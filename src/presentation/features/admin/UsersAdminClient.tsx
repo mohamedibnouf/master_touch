@@ -182,7 +182,7 @@ export function UsersAdminClient({
                   {menuOpenId === u.id ? (
                     <div
                       role="menu"
-                      className="absolute end-0 z-20 mt-1 min-w-52 rounded-[var(--radius)] border border-[var(--line)] bg-white py-1 shadow-[var(--shadow-lift)] dark:bg-[var(--surface)]"
+                      className="absolute end-0 z-20 mt-1 min-w-52 rounded-[var(--radius)] border border-[var(--line)] bg-white py-1 shadow-[var(--shadow-lift)]"
                     >
                       <MenuItem
                         label={t("editUser")}
@@ -329,7 +329,7 @@ export function UsersAdminClient({
                 id="edit-role"
                 name="role_id"
                 required
-                className="flex h-11 w-full rounded-[var(--radius)] border border-[var(--line)] bg-white px-3 text-sm dark:bg-[var(--surface)]"
+                className="flex h-11 w-full rounded-[var(--radius)] border border-[var(--line)] bg-white px-3 text-sm"
                 defaultValue={selected.role_ids[0] ?? manageRoles[0]?.id ?? ""}
               >
                 {manageRoles.map((role) => (
@@ -376,7 +376,7 @@ export function UsersAdminClient({
                 id="change-role"
                 name="role_id"
                 required
-                className="flex h-11 w-full rounded-[var(--radius)] border border-[var(--line)] bg-white px-3 text-sm dark:bg-[var(--surface)]"
+                className="flex h-11 w-full rounded-[var(--radius)] border border-[var(--line)] bg-white px-3 text-sm"
                 defaultValue={selected.role_ids[0] ?? manageRoles[0]?.id ?? ""}
               >
                 {manageRoles.map((role) => (
@@ -522,7 +522,7 @@ function InviteFields({
           id="invite-role"
           name="role_id"
           required
-          className="flex h-11 w-full rounded-[var(--radius)] border border-[var(--line)] bg-white px-3 text-sm dark:bg-[var(--surface)]"
+          className="flex h-11 w-full rounded-[var(--radius)] border border-[var(--line)] bg-white px-3 text-sm"
           defaultValue={roles[0]?.id ?? ""}
         >
           {roles.length === 0 ? (

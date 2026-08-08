@@ -1,12 +1,11 @@
 "use client";
 
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
-import { Menu, Moon, Sun, X, Mail, Phone, Globe, MapPin, ArrowUpRight } from "lucide-react";
+import { Menu, X, Mail, Phone, Globe, MapPin, ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useTheme } from "@/presentation/components/shared/ThemeProvider";
 import { BrandLogo } from "@/presentation/components/shared/BrandLogo";
 
 export function LocaleSwitcher({ compact }: { compact?: boolean }) {
@@ -65,39 +64,6 @@ export function LocaleSwitcher({ compact }: { compact?: boolean }) {
         EN
       </Link>
     </div>
-  );
-}
-
-function ThemeQuickToggle({ light }: { light?: boolean }) {
-  const { theme, setTheme } = useTheme();
-  const mounted = useSyncExternalStore(
-    () => () => undefined,
-    () => true,
-    () => false,
-  );
-
-  if (!mounted) {
-    return <span className="inline-block h-11 w-11" aria-hidden />;
-  }
-
-  const isDark =
-    theme === "dark" ||
-    (theme === "system" &&
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-color-scheme: dark)").matches);
-
-  return (
-    <button
-      type="button"
-      className={cn(
-        "inline-flex h-11 w-11 items-center justify-center transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]",
-        light ? "text-white/80 hover:text-white" : "text-[var(--foreground)]",
-      )}
-      aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
-      onClick={() => setTheme(isDark ? "light" : "dark")}
-    >
-      {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-    </button>
   );
 }
 
@@ -199,7 +165,6 @@ export function SiteHeader({ brand }: { brand: string }) {
           </nav>
 
           <div className="relative z-[1] ms-auto flex items-center gap-1 sm:gap-2">
-            <ThemeQuickToggle light />
             <LocaleSwitcher />
             <Link
               href={`/${locale}/contact`}

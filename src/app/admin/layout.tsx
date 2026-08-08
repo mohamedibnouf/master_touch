@@ -30,7 +30,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   return (
     <NextIntlClientProvider locale={defaultLocale} messages={messages}>
-      <div className="flex min-h-screen bg-[var(--muted)] dark:bg-[var(--background)]" dir="ltr">
+      <div className="flex min-h-screen bg-[var(--muted)]" dir="ltr">
         <AdminSidebar />
         <div className="admin-shell flex min-w-0 flex-1 flex-col">
           <AdminTopbar />

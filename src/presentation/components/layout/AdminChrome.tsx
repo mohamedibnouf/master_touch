@@ -22,7 +22,6 @@ import {
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
-import { ThemeModeSwitcher } from "@/presentation/components/shared/ThemeModeSwitcher";
 import { BrandLogo } from "@/presentation/components/shared/BrandLogo";
 
 const items = [
@@ -111,7 +110,7 @@ export function AdminTopbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-30 flex min-h-14 items-center justify-between gap-3 border-b border-[var(--border)] bg-white/95 px-3 backdrop-blur dark:bg-[color-mix(in_oklab,var(--secondary)_94%,transparent)] sm:px-6">
+      <header className="sticky top-0 z-30 flex min-h-14 items-center justify-between gap-3 border-b border-[var(--border)] bg-white/95 px-3 backdrop-blur sm:px-6">
         <div className="flex min-w-0 items-center gap-3">
           <button
             type="button"
@@ -125,9 +124,6 @@ export function AdminTopbar() {
           <p className="truncate text-sm font-medium text-[var(--muted-foreground)]">{t("welcome")}</p>
         </div>
         <div className="flex min-w-0 flex-wrap items-center justify-end gap-2 sm:gap-3">
-          <div className="max-w-full overflow-x-auto">
-            <ThemeModeSwitcher />
-          </div>
           <Link
             href="/ar"
             className="inline-flex min-h-11 items-center whitespace-nowrap text-xs font-semibold text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"

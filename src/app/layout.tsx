@@ -1,8 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Outfit, Source_Sans_3 } from "next/font/google";
 import { getLocale } from "next-intl/server";
-import { ThemeProvider } from "@/presentation/components/shared/ThemeProvider";
-import { THEME_BOOTSTRAP_SCRIPT } from "@/presentation/components/shared/theme-bootstrap";
 import "./globals.css";
 
 const outfit = Outfit({
@@ -39,6 +37,8 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
+  colorScheme: "light",
+  themeColor: "#f4f6f9",
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -50,16 +50,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   }
 
   return (
-    <html lang={lang} suppressHydrationWarning>
-      <head>
-        <script
-          id="mt-theme-bootstrap"
-          dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP_SCRIPT }}
-        />
-      </head>
-      <body className={`${outfit.variable} ${sourceSans.variable} antialiased`}>
-        <ThemeProvider>{children}</ThemeProvider>
-      </body>
+    <html lang={lang} className="light" style={{ colorScheme: "light" }} suppressHydrationWarning>
+      <body className={`${outfit.variable} ${sourceSans.variable} antialiased`}>{children}</body>
     </html>
   );
 }

@@ -8,7 +8,6 @@ import { Button } from "@/presentation/components/ui/button";
 import { updateThemeAction } from "@/actions/cms";
 import type { ThemeSettings } from "@/types/cms";
 import { SuccessBanner, ErrorState } from "@/presentation/components/admin/AsyncStates";
-import { ThemeModeSwitcher } from "@/presentation/components/shared/ThemeModeSwitcher";
 
 export function ThemeManagerClient({ initialTheme }: { initialTheme: ThemeSettings }) {
   const t = useTranslations("admin");
@@ -22,10 +21,6 @@ export function ThemeManagerClient({ initialTheme }: { initialTheme: ThemeSettin
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-display text-3xl text-[var(--primary)]">{t("theme")}</h1>
-        <div>
-          <p className="mb-2 text-xs text-[var(--muted-foreground)]">{t("themeMode")}</p>
-          <ThemeModeSwitcher />
-        </div>
       </div>
       {saved ? <SuccessBanner message={common("saved")} /> : null}
       {error ? <ErrorState title={common("error")} /> : null}
