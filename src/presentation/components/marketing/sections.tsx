@@ -430,7 +430,6 @@ export function ValuesShowcase({
   const locale = useLocale();
   return (
     <section className="values-blueprint section-pad">
-      <SectionSeams top="var(--background)" bottom="var(--background)" veil />
       <div className="container-mt relative z-[1]">
         <div className="mb-14 flex flex-col gap-8 md:mb-16 lg:flex-row lg:items-end lg:justify-between">
           <motion.div
@@ -458,7 +457,6 @@ export function ValuesShowcase({
             className="hidden items-center gap-3 pb-2 text-[0.65rem] font-semibold tracking-[0.22em] uppercase text-[var(--muted-foreground)] sm:flex"
             aria-hidden
           >
-            <span className="inline-block h-8 w-8 rounded-[var(--radius)] border border-[var(--line)]" />
             <span>
               {String(items.length).padStart(2, "0")}{" "}
               {locale === "ar" ? "وحدات" : "modules"}

@@ -152,24 +152,25 @@ export function SiteHeader({ brand }: { brand: string }) {
       </a>
       <header
         className={cn(
-          "fixed inset-x-0 top-0 z-50 pt-[env(safe-area-inset-top,0px)] transition-all duration-500",
+          "fixed inset-x-0 top-0 z-50 overflow-hidden pt-[env(safe-area-inset-top,0px)] transition-all duration-500",
           scrolled || open
             ? "border-b border-white/10 bg-[color-mix(in_oklab,#06101c_92%,transparent)] shadow-[0_12px_40px_rgba(0,0,0,0.25)] backdrop-blur-xl"
             : "border-b border-transparent bg-gradient-to-b from-[rgba(6,16,28,0.78)] via-[rgba(6,16,28,0.35)] to-transparent",
         )}
       >
-        <div className="relative h-[var(--header-height)] w-full">
+        <div className="relative mx-auto flex h-[var(--header-height)] w-full max-w-[var(--container-max)] items-center gap-3 px-[var(--page-gutter)]">
           <Link
             href={`/${locale}`}
-            className="absolute start-0 top-1/2 z-[1] flex -translate-y-1/2 items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+            className="relative z-[1] flex h-[calc(var(--header-height)-1.15rem)] max-h-[calc(var(--header-height)-1.15rem)] shrink-0 items-center overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
             aria-label={brand}
           >
             <BrandLogo
               priority
-              className="h-[calc(var(--header-height)-0.75rem)] w-auto max-w-[min(58vw,calc((var(--header-height)-0.75rem)*1.65))]"
-              sizes="(max-width:640px) 120px, 160px"
+              className="h-full w-auto max-h-full max-w-[min(42vw,9rem)] object-contain object-center"
+              sizes="(max-width:640px) 112px, 144px"
             />
           </Link>
+
           <nav
             className="absolute left-1/2 top-1/2 z-0 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-1 lg:flex lg:gap-1"
             aria-label="Primary"
@@ -196,7 +197,8 @@ export function SiteHeader({ brand }: { brand: string }) {
               );
             })}
           </nav>
-          <div className="absolute end-0 top-1/2 z-[1] flex -translate-y-1/2 items-center gap-1 pe-[var(--page-gutter)] sm:gap-2">
+
+          <div className="relative z-[1] ms-auto flex items-center gap-1 sm:gap-2">
             <ThemeQuickToggle light />
             <LocaleSwitcher />
             <Link

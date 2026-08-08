@@ -17,10 +17,13 @@ export function BrandLogo({
       src={LOGO_SRC}
       alt="Master Touch"
       width={448}
-      height={285}
+      height={286}
       priority={priority}
       sizes={sizes}
-      className={cn("h-11 w-auto max-w-full object-contain object-[inline-start_center]", className)}
+      className={cn(
+        "h-auto w-auto max-h-full max-w-full object-contain object-center",
+        className,
+      )}
     />
   );
 }
